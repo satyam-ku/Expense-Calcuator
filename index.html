@@ -19,10 +19,6 @@
                         neonPurple: '#bf00ff',
                         neonRed: '#ff3333'
                     },
-                    fontFamily: {
-                        mono: ['"Courier New"', 'monospace'],
-                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                    },
                     animation: {
                         'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                         'slide-up': 'slideUp 0.4s ease-out forwards',
@@ -65,7 +61,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 16px; 
+            font-size: 18px; /* Increased from 16px */
             text-align: center;
         }
         
@@ -77,6 +73,15 @@
             transform: translateY(-2px);
         }
 
+        /* Custom Select Styling */
+        select.input-glow {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+
         .tab-btn { opacity: 0.5; transition: all 0.3s ease; position: relative; }
         .tab-btn.active { opacity: 1; color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .tab-btn.active::after {
@@ -84,98 +89,113 @@
             width: 20px; height: 3px; background: #00f3ff; border-radius: 10px; box-shadow: 0 0 10px #00f3ff;
         }
 
-        /* Circular Progress Logic */
         .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 250px; }
         .circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2.5; }
         .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
         
-        /* Utility */
         .view-hidden { display: none !important; }
         #personDetailOverlay.open { transform: translateY(0); }
         #personDetailOverlay.closed { transform: translateY(100%); }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+        
+        /* Scrollbar for modal */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen text-gray-100 font-sans selection:bg-neonPink selection:text-white pb-6 overflow-x-hidden">
+<body class="min-h-screen text-base text-gray-100 font-sans selection:bg-neonPink selection:text-white pb-6 overflow-x-hidden">
 
     <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#020202]">
         <div class="glass-panel w-full max-w-sm p-10 rounded-[30px] border-t border-white/20 text-center animate-pop-in relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue via-white to-neonPink opacity-50"></div>
             
-            <h1 class="text-5xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-neonBlue to-neonPink">
-                NEON
+            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-neonBlue to-neonPink">
+                FinCaL
             </h1>
-            <p class="text-[9px] uppercase tracking-[0.4em] text-gray-500 mb-10">Financial Operating System</p>
+            <p class="text-xs uppercase tracking-[0.4em] text-gray-500 mb-10">Financial Operating System</p>
 
-            <div id="login-register" class="view-hidden space-y-5">
-                <input type="text" id="regName" placeholder="NAME" class="input-glow w-full p-4 rounded-2xl uppercase tracking-widest text-xs">
-                <input type="number" id="regPin" placeholder="SET PIN (4)" class="input-glow w-full p-4 rounded-2xl font-mono text-xl tracking-[0.5em]" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                <button onclick="registerUser()" class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] mt-2 hover:scale-[1.02] transition-transform text-xs tracking-widest uppercase">
-                    Initialize
+            <div id="login-register" class="view-hidden space-y-6">
+                <input type="text" id="regName" placeholder="USERNAME" class="input-glow w-full p-4 rounded-2xl uppercase tracking-widest text-sm">
+                <input type="number" id="regPin" inputmode="numeric" placeholder="SET PIN (4)" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl tracking-[0.5em]" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+                <button onclick="registerUser()" class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] mt-2 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">
+                    Initialize Account
                 </button>
+                <button onclick="showLogin()" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest mt-4">Cancel</button>
             </div>
 
-            <div id="login-auth" class="view-hidden space-y-5">
+            <div id="login-auth" class="view-hidden space-y-6">
                 <div class="mb-8">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-gray-800 to-black border border-white/10 mx-auto flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(0,243,255,0.1)]">
-                        <i class="fa-solid fa-fingerprint text-3xl text-gray-600"></i>
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-gray-800 to-black border border-white/10 mx-auto flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,243,255,0.1)]">
+                        <i class="fa-solid fa-fingerprint text-4xl text-gray-600"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-white tracking-wide">Welcome, <span id="loginGreeting" class="text-neonBlue">User</span></h2>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Identity</p>
+                    <select id="userSelect" class="input-glow w-full p-3 rounded-xl text-base font-bold uppercase tracking-wider bg-black">
+                        </select>
                 </div>
-                <input type="password" id="authPin" placeholder="• • • •" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl tracking-[0.5em] text-neonBlue" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-neonBlue to-blue-600 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(0,243,255,0.25)] mt-2 hover:scale-[1.02] transition-transform text-xs tracking-widest uppercase">
+                
+                <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glow w-full p-4 rounded-2xl font-mono text-3xl tracking-[0.5em] text-neonBlue" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+                
+                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-neonBlue to-blue-600 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(0,243,255,0.25)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">
                     Unlock Dashboard
                 </button>
-                <p onclick="resetSystem()" class="text-[9px] text-gray-600 mt-6 cursor-pointer hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</p>
+                
+                <div class="flex justify-between mt-8 px-2">
+                    <button onclick="showRegister()" class="text-[10px] text-gray-500 hover:text-neonBlue transition-colors uppercase tracking-widest">+ Create Account</button>
+                    <button onclick="resetSystem()" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
+                </div>
             </div>
         </div>
     </div>
 
-
     <div id="app-view" class="view-hidden">
-        
         <header class="pt-8 pb-4 px-6 sticky top-0 z-40 bg-[#020202]/90 backdrop-blur-xl border-b border-white/5">
             <div class="flex justify-between items-center max-w-2xl mx-auto">
                 <div>
-                    <h1 class="text-lg font-extrabold tracking-tight text-white">NEON<span class="font-light text-gray-500 italic">FLUX</span></h1>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white">Fin <span class="font-light text-gray-500 italic">CaL</span></h1>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest" id="headerUsername">User</p>
                 </div>
-                <div class="flex gap-4 text-[11px] uppercase tracking-widest font-bold">
-                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-3 py-2">Expenses</button>
+                <div class="flex gap-4 text-xs uppercase tracking-widest font-bold">
+                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-3 py-2">Personal </button>
                     <button onclick="switchTab('people')" id="btn-tab-people" class="tab-btn px-3 py-2">People</button>
                 </div>
-                <button onclick="logout()" class="text-gray-600 hover:text-white transition w-8 h-8 flex items-center justify-center bg-white/5 rounded-full"><i class="fa-solid fa-power-off text-xs"></i></button>
+                <button onclick="logout()" class="text-gray-600 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full"><i class="fa-solid fa-power-off text-sm"></i></button>
             </div>
         </header>
 
         <main class="max-w-2xl mx-auto px-4 py-6 relative space-y-8">
-            
             <div id="tab-expenses-content" class="flex flex-col gap-8 animate-pop-in">
-                
                 <div class="glass-panel rounded-[35px] p-6 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-neonBlue blur-[80px] opacity-20"></div>
                     <div class="absolute bottom-0 left-0 w-32 h-32 bg-neonPink blur-[80px] opacity-10"></div>
-                    
                     <div class="relative z-10 grid grid-cols-2 gap-4 items-center">
-                        <div class="relative w-36 h-36 mx-auto">
+                        <div class="relative w-40 h-40 mx-auto">
                             <svg viewBox="0 0 36 36" class="circular-chart">
                                 <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <path id="ring-progress" class="circle" stroke="#00f3ff" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                <span class="text-[9px] text-gray-400 uppercase tracking-widest mb-1">Balance</span>
-                                <span class="text-xl font-bold font-mono text-white tracking-tight">₹<span id="displayBalance">0</span></span>
+                                <span class="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Balance</span>
+                                <span class="text-2xl font-bold font-mono text-white tracking-tight">₹<span id="displayBalance">0</span></span>
                             </div>
                         </div>
-                        <div class="text-right space-y-4">
+                        <div class="text-right space-y-5">
                             <div>
-                                <p class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Monthly Limit</p>
+                                <p class="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Monthly Limit</p>
                                 <div class="flex justify-end items-center gap-2">
-                                    <span class="text-gray-400 text-sm">₹</span>
-                                    <input type="number" id="budgetInput" onchange="setBudget()" placeholder="0" class="bg-transparent border-b border-gray-700 w-20 text-right text-white font-mono text-lg focus:outline-none focus:border-neonBlue transition-colors">
+                                    <span class="text-gray-400 text-base">₹</span>
+                                    <input type="number" id="budgetInput" onchange="setBudget()" placeholder="0" class="bg-transparent border-b border-gray-700 w-24 text-right text-white font-mono text-xl focus:outline-none focus:border-neonBlue transition-colors">
                                 </div>
                             </div>
                             <div>
-                                <p class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Total Spent</p>
-                                <p class="text-lg font-mono text-red-400 font-bold drop-shadow-[0_0_10px_rgba(255,50,50,0.4)]">₹<span id="displaySpent">0</span></p>
+                                <p class="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Total Spent</p>
+                                <p class="text-xl font-mono text-red-400 font-bold drop-shadow-[0_0_10px_rgba(255,50,50,0.4)]">₹<span id="displaySpent">0</span></p>
                             </div>
                         </div>
                     </div>
@@ -185,16 +205,16 @@
                     <div class="bg-black/40 rounded-[28px] p-6 text-center">
                         <div class="flex flex-col gap-4">
                             <div class="relative">
-                                <i class="fa-solid fa-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
-                                <input type="text" id="expenseName" placeholder="Expense Name (e.g. Pizza)" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-10 pr-4 text-white text-sm focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all placeholder-gray-600">
+                                <i class="fa-solid fa-tag absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 text-sm"></i>
+                                <input type="text" id="expenseName" placeholder="Expense Name..." class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white text-base focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all placeholder-gray-600">
                             </div>
                             <div class="grid grid-cols-4 gap-2">
                                 <div class="col-span-3 relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neonGreen font-bold">₹</span>
-                                    <input type="number" id="expenseAmount" placeholder="0" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-8 pr-4 text-white font-mono text-lg focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-neonGreen font-bold text-lg">₹</span>
+                                    <input type="number" id="expenseAmount" placeholder="0" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-10 pr-4 text-white font-mono text-xl focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all">
                                 </div>
                                 <button onclick="addExpense()" class="col-span-1 bg-neonGreen text-black rounded-xl flex items-center justify-center hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,255,157,0.3)]">
-                                    <i class="fa-solid fa-plus text-xl"></i>
+                                    <i class="fa-solid fa-plus text-2xl"></i>
                                 </button>
                             </div>
                         </div>
@@ -202,151 +222,227 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center px-4 mb-2">
-                        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Transaction Log</h3>
-                        <button onclick="resetExpenses()" class="text-[9px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-2 py-1 rounded-md">Clear</button>
+                    <div class="flex justify-between items-center px-4 mb-3">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Transaction Log</h3>
+                        <div class="flex gap-2">
+                            <button onclick="showMonthlyStats()" class="text-[10px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Monthly</button>
+                            <button onclick="exportCSV()" class="text-[10px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-download mr-1"></i> Export</button>
+                            <button onclick="resetExpenses()" class="text-[10px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded-md">Clear</button>
+                        </div>
                     </div>
                     <div class="glass-panel rounded-[30px] overflow-hidden min-h-[300px]">
                         <div id="expenseList" class="divide-y divide-white/5"></div>
-                        <div id="emptyState" class="hidden py-16 text-center">
-                            <i class="fa-solid fa-box-open text-4xl text-gray-800 mb-2"></i>
-                            <p class="text-[10px] text-gray-600 uppercase tracking-widest">No Data</p>
+                        <div id="emptyState" class="hidden py-20 text-center">
+                            <i class="fa-solid fa-box-open text-5xl text-gray-800 mb-3"></i>
+                            <p class="text-xs text-gray-600 uppercase tracking-widest">No Data</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-people-content" class="hidden animate-pop-in flex-col gap-8">
-                
                 <div class="glass-panel rounded-[30px] p-1">
-                    <div class="bg-black/40 rounded-[28px] p-2 pl-6 flex items-center gap-4">
-                        <i class="fa-solid fa-user-plus text-neonBlue text-sm"></i>
-                        <input type="text" id="newPersonName" placeholder="New Person Name..." class="bg-transparent border-none w-full text-white text-sm focus:outline-none h-12">
-                        <button onclick="addPerson()" class="h-12 w-16 bg-neonBlue rounded-[22px] flex items-center justify-center text-black hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,243,255,0.3)]">
-                            <i class="fa-solid fa-arrow-right"></i>
+                    <div class="bg-black/40 rounded-[28px] p-3 pl-6 flex items-center gap-4">
+                        <i class="fa-solid fa-user-plus text-neonBlue text-base"></i>
+                        <input type="text" id="newPersonName" placeholder="New Person Name..." class="bg-transparent border-none w-full text-white text-base focus:outline-none h-14">
+                        <button onclick="addPerson()" class="h-14 w-20 bg-neonBlue rounded-[22px] flex items-center justify-center text-black hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,243,255,0.3)]">
+                            <i class="fa-solid fa-arrow-right text-lg"></i>
                         </button>
                     </div>
                 </div>
-
-                <div id="peopleGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="peopleGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="peopleEmptyState" class="hidden py-24 text-center">
+                    <div class="w-24 h-24 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-5 border border-white/5">
+                        <i class="fa-solid fa-users text-3xl text-gray-700"></i>
                     </div>
-                
-                <div id="peopleEmptyState" class="hidden py-20 text-center">
-                    <div class="w-20 h-20 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-4 border border-white/5">
-                        <i class="fa-solid fa-users text-2xl text-gray-700"></i>
-                    </div>
-                    <p class="text-xs text-gray-600 uppercase tracking-widest">No Active Ledgers</p>
+                    <p class="text-sm text-gray-600 uppercase tracking-widest">No Active Ledgers</p>
                 </div>
             </div>
         </main>
 
         <div id="personDetailOverlay" class="fixed inset-0 z-50 bg-[#020202] closed flex flex-col h-full w-full overflow-hidden transition-transform duration-300">
             <div class="p-6 flex items-center justify-between border-b border-white/10">
-                <button onclick="closePersonDetails()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10"><i class="fa-solid fa-arrow-left"></i></button>
+                <button onclick="closePersonDetails()" class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10"><i class="fa-solid fa-arrow-left text-lg"></i></button>
                 <div class="text-center">
-                    <h2 class="text-sm font-bold text-white tracking-widest uppercase" id="detailPersonName">Name</h2>
-                    <p class="text-[9px] text-gray-500 uppercase tracking-widest">Ledger Details</p>
+                    <h2 class="text-base font-bold text-white tracking-widest uppercase" id="detailPersonName">Name</h2>
+                    <p class="text-[11px] text-gray-500 uppercase tracking-widest">Ledger Details</p>
                 </div>
-                <button onclick="deleteCurrentPerson()" class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 hover:bg-red-500/20"><i class="fa-solid fa-trash"></i></button>
+                <button onclick="deleteCurrentPerson()" class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 hover:bg-red-500/20"><i class="fa-solid fa-trash text-lg"></i></button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-8">
-                
-                <div class="glass-panel p-10 rounded-full w-64 h-64 flex flex-col items-center justify-center relative border border-white/10 mt-4">
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-10">
+                <div class="glass-panel p-10 rounded-full w-72 h-72 flex flex-col items-center justify-center relative border border-white/10 mt-6">
                     <div class="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
-                    <div class="absolute w-32 h-32 bg-neonBlue blur-[60px] opacity-10" id="detailGlow"></div>
-                    
-                    <p class="text-gray-500 text-[9px] uppercase tracking-[0.3em] mb-2 relative z-10">Net Standing</p>
-                    <div class="text-4xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
-                    <div class="px-3 py-1 rounded-full bg-white/5 border border-white/10 relative z-10">
-                        <p class="text-[9px] text-gray-400 uppercase tracking-widest" id="detailStatus">Settled</p>
+                    <div class="absolute w-40 h-40 bg-neonBlue blur-[70px] opacity-10" id="detailGlow"></div>
+                    <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-3 relative z-10">Net Standing</p>
+                    <div class="text-5xl font-mono font-bold text-white mb-3 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
+                    <div class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 relative z-10">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" id="detailStatus">Settled</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
-                    <button onclick="openTransactionModal('GAVE')" class="group relative overflow-hidden p-5 rounded-3xl bg-[#0a0505] border border-red-500/20 text-center transition-transform active:scale-95">
+                <div class="grid grid-cols-2 gap-5 w-full max-w-sm">
+                    <button onclick="openTransactionModal('GAVE')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#0a0505] border border-red-500/20 text-center transition-transform active:scale-95">
                         <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
-                        <i class="fa-solid fa-arrow-up text-red-500 text-xl mb-2"></i>
-                        <p class="text-xs font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Gave</p>
-                        <p class="text-[9px] text-red-500/60 mt-1">THEY OWE YOU</p>
+                        <i class="fa-solid fa-arrow-up text-red-500 text-2xl mb-3"></i>
+                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Gave</p>
+                        <p class="text-[10px] text-red-500/60 mt-1">THEY OWE YOU</p>
                     </button>
-                    <button onclick="openTransactionModal('GOT')" class="group relative overflow-hidden p-5 rounded-3xl bg-[#050a0a] border border-neonBlue/20 text-center transition-transform active:scale-95">
+                    <button onclick="openTransactionModal('GOT')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#050a0a] border border-neonBlue/20 text-center transition-transform active:scale-95">
                         <div class="absolute inset-0 bg-neonBlue/5 group-hover:bg-neonBlue/10 transition-colors"></div>
-                        <i class="fa-solid fa-arrow-down text-neonBlue text-xl mb-2"></i>
-                        <p class="text-xs font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Got</p>
-                        <p class="text-[9px] text-neonBlue/60 mt-1">REPAYMENT</p>
+                        <i class="fa-solid fa-arrow-down text-neonBlue text-2xl mb-3"></i>
+                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Got</p>
+                        <p class="text-[10px] text-neonBlue/60 mt-1">REPAYMENT</p>
                     </button>
                 </div>
 
-                <div class="w-full max-w-md pb-10">
-                    <h3 class="text-[10px] text-gray-600 font-bold uppercase mb-4 ml-2 tracking-widest">History Log</h3>
-                    <div id="personHistoryList" class="space-y-3"></div>
+                <div class="w-full max-w-md pb-12">
+                    <h3 class="text-xs text-gray-600 font-bold uppercase mb-5 ml-2 tracking-widest">History Log</h3>
+                    <div id="personHistoryList" class="space-y-4"></div>
                 </div>
             </div>
             
             <div id="txInputModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
                 <div class="glass-panel w-full max-w-xs p-8 rounded-[30px] border border-white/20 text-center animate-pop-in relative">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue to-neonPink opacity-50"></div>
-                    <h3 class="text-sm font-bold mb-6 uppercase tracking-widest text-white" id="txModalType">Record</h3>
-                    <div class="space-y-4">
-                        <input type="text" id="txDesc" placeholder="Description (e.g. Lunch)" class="input-glow w-full p-4 rounded-2xl text-sm">
+                    <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white" id="txModalType">Record</h3>
+                    <div class="space-y-5">
+                        <input type="text" id="txDesc" placeholder="Description (e.g. Lunch)" class="input-glow w-full p-4 rounded-2xl text-base">
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
-                            <input type="number" id="txAmt" placeholder="0" class="input-glow w-full p-4 rounded-2xl font-mono text-xl pl-8">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                            <input type="number" id="txAmt" placeholder="0" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl pl-10">
                         </div>
-                        <div class="grid grid-cols-2 gap-2 pt-2">
-                            <button onclick="closeTxModal()" class="py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
-                            <button onclick="submitPersonTx()" class="py-3 rounded-xl bg-white text-black font-bold text-xs shadow-[0_0_20px_rgba(255,255,255,0.2)]">CONFIRM</button>
+                        <div class="grid grid-cols-2 gap-3 pt-3">
+                            <button onclick="closeTxModal()" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                            <button onclick="submitPersonTx()" class="py-3.5 rounded-xl bg-white text-black font-bold text-xs shadow-[0_0_20px_rgba(255,255,255,0.2)]">CONFIRM</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div id="monthlyStatsModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-sm p-8 rounded-[30px] border border-white/20 animate-pop-in relative flex flex-col max-h-[80vh]">
+                <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-center text-neonPurple">Monthly Breakdown</h3>
+                <div id="monthlyStatsList" class="overflow-y-auto flex-1 space-y-4 pr-2 custom-scrollbar"></div>
+                <button onclick="closeMonthlyStats()" class="mt-6 py-4 w-full rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition">CLOSE</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         let currentUser = null; 
+        let userRegistry = [];
         let currentTab = 'expenses';
         let expensesData = { budget: 0, list: [] };
         let peopleData = []; 
         let activePersonId = null, activeTxType = null; 
 
-        window.onload = function() { checkAuth(); };
+        window.onload = function() { initSystem(); };
 
-        function checkAuth() {
-            const stored = localStorage.getItem('neonFlux_user');
-            if (!stored) {
-                document.getElementById('login-view').classList.remove('view-hidden');
-                document.getElementById('login-register').classList.remove('view-hidden');
+        function initSystem() {
+            // MIGRATION: Check if old single-user data exists
+            const legacyUser = localStorage.getItem('neonFlux_user');
+            const registry = localStorage.getItem('neonFlux_registry');
+            
+            if (legacyUser && !registry) {
+                // Perform migration
+                const oldUser = JSON.parse(legacyUser);
+                const oldExp = localStorage.getItem('neonFlux_expenses_v2');
+                const oldPpl = localStorage.getItem('neonFlux_people_v2');
+                
+                const newId = 'legacy_' + Date.now();
+                const newUser = { id: newId, name: oldUser.name, pin: oldUser.pin };
+                
+                userRegistry = [newUser];
+                localStorage.setItem('neonFlux_registry', JSON.stringify(userRegistry));
+                
+                if(oldExp) localStorage.setItem('neonFlux_expenses_' + newId, oldExp);
+                if(oldPpl) localStorage.setItem('neonFlux_people_' + newId, oldPpl);
+                
+                // Cleanup old keys
+                localStorage.removeItem('neonFlux_user');
+                localStorage.removeItem('neonFlux_expenses_v2');
+                localStorage.removeItem('neonFlux_people_v2');
             } else {
-                currentUser = JSON.parse(stored);
-                document.getElementById('loginGreeting').innerText = currentUser.name;
-                document.getElementById('login-view').classList.remove('view-hidden');
-                document.getElementById('login-auth').classList.remove('view-hidden');
+                if(registry) userRegistry = JSON.parse(registry);
             }
+
+            renderAuthScreen();
+        }
+
+        function renderAuthScreen() {
+            document.getElementById('login-view').classList.remove('view-hidden');
+            if (userRegistry.length === 0) {
+                showRegister();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showRegister() {
+            document.getElementById('login-auth').classList.add('view-hidden');
+            document.getElementById('login-register').classList.remove('view-hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('login-register').classList.add('view-hidden');
+            const authDiv = document.getElementById('login-auth');
+            authDiv.classList.remove('view-hidden');
+            
+            const select = document.getElementById('userSelect');
+            select.innerHTML = '';
+            userRegistry.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.text = u.name;
+                select.appendChild(opt);
+            });
         }
 
         function registerUser() {
             const name = document.getElementById('regName').value.trim();
             const pin = document.getElementById('regPin').value.trim();
             if (!name || pin.length !== 4) return alert("Name & 4-digit PIN required");
-            currentUser = { name, pin };
-            localStorage.setItem('neonFlux_user', JSON.stringify(currentUser));
+            
+            const newUser = {
+                id: 'u_' + Date.now(),
+                name: name,
+                pin: pin
+            };
+            
+            userRegistry.push(newUser);
+            localStorage.setItem('neonFlux_registry', JSON.stringify(userRegistry));
+            
+            // Auto-login
+            currentUser = newUser;
             loadApp();
         }
 
         function authenticateUser() {
-            if (document.getElementById('authPin').value.trim() === currentUser.pin) loadApp();
-            else { alert("Wrong PIN"); document.getElementById('authPin').value = ''; }
+            const selectedId = document.getElementById('userSelect').value;
+            const pinField = document.getElementById('authPin');
+            
+            const user = userRegistry.find(u => u.id === selectedId);
+            
+            if (user && pinField.value.trim() === user.pin) {
+                currentUser = user;
+                loadApp();
+                pinField.value = '';
+            } else {
+                pinField.classList.add('animate-shake');
+                setTimeout(() => pinField.classList.remove('animate-shake'), 400);
+                pinField.value = '';
+            }
         }
 
         function loadApp() {
             document.getElementById('login-view').style.display = 'none';
             document.getElementById('app-view').classList.remove('view-hidden');
-            loadData(); switchTab('expenses');
+            document.getElementById('headerUsername').innerText = currentUser.name;
+            loadData(); 
+            switchTab('expenses');
         }
-        function logout() { window.location.reload(); }
-        function resetSystem() { if(confirm("Reset everything?")) { localStorage.clear(); window.location.reload(); } }
 
         function switchTab(tab) {
             document.getElementById('tab-expenses-content').classList.add('hidden');
@@ -361,16 +457,14 @@
 
         function setBudget() {
             const val = parseFloat(document.getElementById('budgetInput').value);
-            if(!isNaN(val) && val > 0) { expensesData.budget = val; saveAll(); renderExpenses(); }
+            if(!isNaN(val) && val >= 0) { expensesData.budget = val; saveAll(); renderExpenses(); }
         }
 
         function getIconForExpense(name) {
             const n = name.toLowerCase();
-            if(n.includes('food') || n.includes('burger') || n.includes('pizza') || n.includes('lunch') || n.includes('dinner')) return 'fa-utensils';
-            if(n.includes('uber') || n.includes('ola') || n.includes('taxi') || n.includes('fuel') || n.includes('petrol')) return 'fa-car';
-            if(n.includes('movie') || n.includes('netflix') || n.includes('game')) return 'fa-film';
-            if(n.includes('shop') || n.includes('cloth') || n.includes('amazon')) return 'fa-bag-shopping';
-            if(n.includes('recharge') || n.includes('wifi') || n.includes('bill')) return 'fa-bolt';
+            if(n.includes('food') || n.includes('lunch')) return 'fa-utensils';
+            if(n.includes('taxi') || n.includes('fuel')) return 'fa-car';
+            if(n.includes('bill') || n.includes('recharge')) return 'fa-bolt';
             return 'fa-receipt';
         }
 
@@ -378,68 +472,94 @@
             const name = document.getElementById('expenseName').value.trim();
             const amt = parseFloat(document.getElementById('expenseAmount').value);
             if(!name || isNaN(amt) || amt <= 0) return;
-            const now = new Date();
             expensesData.list.unshift({
-                id: Date.now(), name: name, amount: amt,
-                date: now.toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
+                id: Date.now(), name, amount: amt,
+                date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
                 icon: getIconForExpense(name)
             });
-            document.getElementById('expenseName').value = ''; document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseName').value = ''; 
+            document.getElementById('expenseAmount').value = '';
             saveAll(); renderExpenses();
-        }
-
-        function deleteExpense(id) {
-            if(confirm('Delete?')) { expensesData.list = expensesData.list.filter(e => e.id !== id); saveAll(); renderExpenses(); }
-        }
-
-        function resetExpenses() {
-            if(confirm('Clear history?')) { expensesData = { budget: 0, list: [] }; saveAll(); renderExpenses(); }
         }
 
         function renderExpenses() {
             const total = expensesData.list.reduce((sum, item) => sum + item.amount, 0);
             const remaining = expensesData.budget - total;
             const percent = expensesData.budget > 0 ? (total / expensesData.budget) * 100 : 0;
-            const strokeDash = Math.max(0, 100 - percent);
             const ring = document.getElementById('ring-progress');
-            ring.style.strokeDasharray = `${strokeDash}, 100`;
+            ring.style.strokeDasharray = `${Math.max(0, 100 - percent)}, 100`;
             ring.style.stroke = remaining < 0 ? '#ff3333' : '#00f3ff';
+            
             document.getElementById('displayBalance').innerText = formatMoney(remaining);
             document.getElementById('displaySpent').innerText = formatMoney(total);
-            if(expensesData.budget > 0) document.getElementById('budgetInput').value = expensesData.budget;
+            document.getElementById('budgetInput').value = expensesData.budget;
+
             const listEl = document.getElementById('expenseList');
             listEl.innerHTML = '';
-            if(expensesData.list.length === 0) document.getElementById('emptyState').classList.remove('hidden');
-            else {
+            if(expensesData.list.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+            } else {
                 document.getElementById('emptyState').classList.add('hidden');
                 expensesData.list.forEach(item => {
                     listEl.innerHTML += `
-                        <div class="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition animate-slide-up">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-neonBlue">
-                                    <i class="fa-solid ${item.icon}"></i>
+                        <div class="flex items-center justify-between px-6 py-5 hover:bg-white/[0.03] transition animate-slide-up border-b border-white/5 last:border-0">
+                            <div class="flex items-center gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-neonBlue">
+                                    <i class="fa-solid ${item.icon} text-lg"></i>
                                 </div>
                                 <div>
-                                    <p class="text-gray-200 text-sm font-medium">${item.name}</p>
-                                    <p class="text-[10px] text-gray-500 font-mono">${item.date}</p>
+                                    <p class="text-gray-200 text-base font-medium">${item.name}</p>
+                                    <p class="text-xs font-bold text-neonBlue uppercase tracking-widest mt-0.5 opacity-80">${item.date}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-white font-mono font-bold">₹${formatMoney(item.amount)}</p>
-                                <button onclick="deleteExpense(${item.id})" class="text-[9px] text-gray-600 hover:text-red-500 mt-1">DEL</button>
+                                <p class="text-white font-mono font-bold text-lg">₹${formatMoney(item.amount)}</p>
+                                <button onclick="deleteExpense(${item.id})" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase">DEL</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
         }
 
-        function addPerson() {
-            const name = document.getElementById('newPersonName').value.trim();
-            if(!name) return;
-            peopleData.push({ id: Date.now(), name: name, transactions: [] });
-            document.getElementById('newPersonName').value = '';
-            saveAll(); renderPeopleGrid();
+        function showMonthlyStats() {
+            const stats = {};
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            expensesData.list.forEach(item => {
+                const parts = item.date.split(' ');
+                if(parts.length > 1) {
+                    const month = parts[1];
+                    if(!stats[month]) stats[month] = 0;
+                    stats[month] += item.amount;
+                }
+            });
+            const listEl = document.getElementById('monthlyStatsList');
+            listEl.innerHTML = '';
+            const sortedMonths = Object.keys(stats).sort((a,b) => months.indexOf(a) - months.indexOf(b));
+            if(sortedMonths.length === 0) {
+                listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Data Recorded</p>';
+            } else {
+                sortedMonths.forEach(m => {
+                    listEl.innerHTML += `
+                        <div class="flex justify-between items-center bg-white/5 p-5 rounded-xl border border-white/5">
+                            <span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span>
+                            <span class="text-neonPurple font-mono font-bold text-lg">₹${formatMoney(stats[m])}</span>
+                        </div>`;
+                });
+            }
+            document.getElementById('monthlyStatsModal').classList.remove('hidden');
+        }
+
+        function closeMonthlyStats() { document.getElementById('monthlyStatsModal').classList.add('hidden'); }
+
+        function exportCSV() {
+            let csv = "Date,Name,Amount\n";
+            expensesData.list.forEach(item => csv += `${item.date},${item.name},${item.amount}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `${currentUser.name}_expenses.csv`);
+            a.click();
         }
 
         function renderPeopleGrid() {
@@ -450,99 +570,106 @@
                 document.getElementById('peopleEmptyState').classList.add('hidden');
                 peopleData.forEach(p => {
                     let bal = 0; p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
-                    const isPos = bal > 0;
-                    // Styling Logic
-                    const borderColor = isPos ? 'border-neonBlue/30' : (bal < 0 ? 'border-red-500/30' : 'border-white/10');
-                    const glowColor = isPos ? 'shadow-[0_0_20px_rgba(0,243,255,0.15)]' : (bal < 0 ? 'shadow-[0_0_20px_rgba(255,50,50,0.15)]' : '');
-                    const textColor = isPos ? 'text-neonBlue' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
-                    const label = isPos ? 'THEY OWE YOU' : (bal < 0 ? 'YOU OWE' : 'SETTLED');
-                    const initial = p.name.charAt(0).toUpperCase();
-
                     grid.innerHTML += `
-                        <div onclick="openPersonDetails(${p.id})" class="glass-panel p-6 rounded-[24px] relative overflow-hidden group hover:scale-[1.02] transition-all cursor-pointer border ${borderColor} ${glowColor}">
-                             <div class="absolute -top-10 -right-10 w-32 h-32 ${isPos?'bg-neonBlue':'bg-red-500'} blur-[60px] opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                             
-                             <div class="flex items-center justify-between mb-4 relative z-10">
-                                <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-white text-sm">
-                                    ${initial}
-                                </div>
-                                <div class="px-2 py-1 rounded-md bg-white/5 border border-white/5">
-                                    <p class="text-[9px] uppercase tracking-widest text-gray-400">${label}</p>
-                                </div>
-                             </div>
-                             
-                             <h3 class="text-lg font-bold text-white mb-1 relative z-10 truncate">${p.name}</h3>
-                             <p class="text-2xl font-mono font-bold ${textColor} relative z-10">₹${formatMoney(Math.abs(bal))}</p>
-                        </div>
-                    `;
+                        <div onclick="openPersonDetails(${p.id})" class="glass-panel p-6 rounded-[24px] border ${bal >= 0 ? 'border-neonBlue/20' : 'border-red-500/20'} cursor-pointer hover:scale-[1.02] transition-transform">
+                            <h3 class="text-xl font-bold">${p.name}</h3>
+                            <p class="text-3xl font-mono ${bal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(bal))}</p>
+                        </div>`;
                 });
             }
         }
-        
+
         function openPersonDetails(id) {
             activePersonId = id; const p = peopleData.find(x => x.id === id);
             document.getElementById('detailPersonName').innerText = p.name;
             renderPersonDetailsInternal(p);
-            document.getElementById('personDetailOverlay').classList.remove('closed');
-            document.getElementById('personDetailOverlay').classList.add('open');
+            document.getElementById('personDetailOverlay').classList.replace('closed','open');
         }
-        function closePersonDetails() {
-            document.getElementById('personDetailOverlay').classList.remove('open');
-            document.getElementById('personDetailOverlay').classList.add('closed');
-            renderPeopleGrid();
-        }
+
         function renderPersonDetailsInternal(p) {
             let bal = 0; p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
             document.getElementById('detailBalance').innerText = `₹${formatMoney(Math.abs(bal))}`;
-            document.getElementById('detailBalance').className = `text-4xl font-mono font-bold mb-2 relative z-10 tracking-tighter ${bal>0?'text-neonBlue':(bal<0?'text-red-500':'text-gray-500')}`;
-            document.getElementById('detailStatus').innerText = bal>0 ? 'OWES YOU' : (bal<0 ? 'YOU OWE' : 'SETTLED');
-            document.getElementById('detailGlow').className = `absolute w-32 h-32 blur-[60px] opacity-20 ${bal>0?'bg-neonBlue':(bal<0?'bg-red-500':'bg-white')}`;
-
-            const list = document.getElementById('personHistoryList'); list.innerHTML = '';
-            if(p.transactions.length === 0) {
-                 list.innerHTML = '<p class="text-center text-[10px] text-gray-600 uppercase py-4">No Records Yet</p>';
-            } else {
-                [...p.transactions].sort((a,b)=>b.id-a.id).forEach(t => {
-                    const isGave = t.type === 'GAVE';
-                    list.innerHTML += `
-                        <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5 animate-slide-up">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center ${isGave?'bg-red-500/10 text-red-500':'bg-neonBlue/10 text-neonBlue'}">
-                                    <i class="fa-solid ${isGave?'fa-arrow-up':'fa-arrow-down'} text-xs"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-300 font-bold">${t.desc || (isGave?'Given':'Got')}</p>
-                                    <p class="text-[9px] text-gray-600 font-mono">${t.date}</p>
-                                </div>
+            document.getElementById('detailStatus').innerText = bal > 0 ? 'OWES YOU' : (bal < 0 ? 'YOU OWE' : 'SETTLED');
+            
+            const list = document.getElementById('personHistoryList'); 
+            list.innerHTML = '';
+            
+            p.transactions.sort((a,b) => b.id - a.id).forEach(t => {
+                const isGave = t.type === 'GAVE';
+                list.innerHTML += `
+                    <div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up">
+                        <div class="flex items-center gap-4">
+                            <div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 min-w-[65px]">
+                                <p class="text-xs font-black text-white leading-tight uppercase tracking-tighter">${t.date}</p>
                             </div>
-                            <div class="text-right">
-                                <p class="font-mono text-sm font-bold text-white">₹${formatMoney(t.amount)}</p>
-                                <button onclick="delTx(${t.id})" class="text-[9px] text-gray-600 hover:text-red-500 mt-1">DEL</button>
+                            <div>
+                                <p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p>
+                                <p class="text-[10px] font-bold ${isGave ? 'text-red-400' : 'text-neonBlue'} uppercase tracking-widest">${t.type}</p>
                             </div>
                         </div>
-                    `;
-                });
-            }
+                        <div class="text-right">
+                            <p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p>
+                            <button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors">DEL</button>
+                        </div>
+                    </div>`;
+            });
         }
-        function delTx(id) { if(confirm('Del?')) { const p = peopleData.find(x=>x.id===activePersonId); p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); }}
-        function deleteCurrentPerson() { if(confirm('Delete Person?')) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } }
-        function openTransactionModal(type) { activeTxType=type; document.getElementById('txModalType').innerText = type==='GAVE'?'I Gave (They Owe)':'I Got (Repayment)'; document.getElementById('txInputModal').classList.remove('hidden'); }
+
+        function addPerson() {
+            const name = document.getElementById('newPersonName').value.trim();
+            if(!name) return;
+            peopleData.push({ id: Date.now(), name, transactions: [] });
+            document.getElementById('newPersonName').value = '';
+            saveAll(); renderPeopleGrid();
+        }
+
+        function saveAll() {
+            if(!currentUser) return;
+            localStorage.setItem('neonFlux_expenses_' + currentUser.id, JSON.stringify(expensesData));
+            localStorage.setItem('neonFlux_people_' + currentUser.id, JSON.stringify(peopleData));
+        }
+
+        function loadData() {
+            if(!currentUser) return;
+            expensesData = { budget: 0, list: [] };
+            peopleData = [];
+            const e = localStorage.getItem('neonFlux_expenses_' + currentUser.id); if(e) expensesData = JSON.parse(e);
+            const p = localStorage.getItem('neonFlux_people_' + currentUser.id); if(p) peopleData = JSON.parse(p);
+        }
+
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('en-IN').format(Math.round(amount));
+        }
+
+        function logout() { 
+            currentUser = null; 
+            document.getElementById('app-view').classList.add('view-hidden');
+            document.getElementById('login-view').style.display = 'flex';
+            renderAuthScreen();
+        }
+        
+        function resetSystem() { 
+            if(confirm("DANGER: This will delete ALL users and ALL data on this device. Continue?")) { 
+                localStorage.clear(); 
+                window.location.reload(); 
+            } 
+        }
+        
+        function closePersonDetails() { document.getElementById('personDetailOverlay').classList.replace('open','closed'); renderPeopleGrid(); }
+        function deleteExpense(id) { if(confirm("Delete this expense?")) { expensesData.list = expensesData.list.filter(e => e.id !== id); saveAll(); renderExpenses(); } }
+        function delTx(id) { if(confirm("Delete this record?")) { const p = peopleData.find(x=>x.id===activePersonId); p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); } }
+        function deleteCurrentPerson() { if(confirm("Delete this ledger entirely?")) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } }
+        function resetExpenses() { if(confirm("Clear all expenses?")) { expensesData.list = []; saveAll(); renderExpenses(); } }
+
+        function openTransactionModal(type) { activeTxType=type; document.getElementById('txModalType').innerText = type; document.getElementById('txInputModal').classList.remove('hidden'); }
         function closeTxModal() { document.getElementById('txInputModal').classList.add('hidden'); document.getElementById('txDesc').value=''; document.getElementById('txAmt').value=''; }
         function submitPersonTx() {
             const amt = parseFloat(document.getElementById('txAmt').value);
             if(isNaN(amt)||amt<=0) return;
             const p = peopleData.find(x=>x.id===activePersonId);
-            const now = new Date();
-            p.transactions.push({id:Date.now(), type:activeTxType, amount:amt, desc:document.getElementById('txDesc').value, date: now.toLocaleDateString('en-IN', {day:'numeric', month:'short'})});
+            p.transactions.push({id:Date.now(), type:activeTxType, amount:amt, desc:document.getElementById('txDesc').value, date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'})});
             saveAll(); closeTxModal(); renderPersonDetailsInternal(p);
         }
-
-        function saveAll() { localStorage.setItem('neonFlux_expenses_v2', JSON.stringify(expensesData)); localStorage.setItem('neonFlux_people_v2', JSON.stringify(peopleData)); }
-        function loadData() {
-            const e = localStorage.getItem('neonFlux_expenses_v2'); if(e) expensesData = JSON.parse(e);
-            const p = localStorage.getItem('neonFlux_people_v2'); if(p) peopleData = JSON.parse(p);
-        }
-        function formatMoney(amount) { return new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount); }
     </script>
 </body>
 </html>
