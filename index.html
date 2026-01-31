@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonFlux | Ultimate</title>
+    <title>FinCaL | Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -61,7 +61,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 18px; /* Increased from 16px */
+            font-size: 18px; 
             text-align: center;
         }
         
@@ -73,7 +73,6 @@
             transform: translateY(-2px);
         }
 
-        /* Custom Select Styling */
         select.input-glow {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
@@ -103,8 +102,6 @@
             75% { transform: translateX(10px); }
         }
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-        
-        /* Scrollbar for modal */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 4px; }
@@ -115,18 +112,13 @@
     <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#020202]">
         <div class="glass-panel w-full max-w-sm p-10 rounded-[30px] border-t border-white/20 text-center animate-pop-in relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue via-white to-neonPink opacity-50"></div>
-            
-            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-neonBlue to-neonPink">
-                FinCaL
-            </h1>
+            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-neonBlue to-neonPink">FinCaL</h1>
             <p class="text-xs uppercase tracking-[0.4em] text-gray-500 mb-10">Financial Operating System</p>
 
             <div id="login-register" class="view-hidden space-y-6">
                 <input type="text" id="regName" placeholder="USERNAME" class="input-glow w-full p-4 rounded-2xl uppercase tracking-widest text-sm">
                 <input type="number" id="regPin" inputmode="numeric" placeholder="SET PIN (4)" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl tracking-[0.5em]" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                <button onclick="registerUser()" class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] mt-2 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">
-                    Initialize Account
-                </button>
+                <button onclick="registerUser()" class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] mt-2 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Initialize Account</button>
                 <button onclick="showLogin()" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest mt-4">Cancel</button>
             </div>
 
@@ -136,16 +128,10 @@
                         <i class="fa-solid fa-fingerprint text-4xl text-gray-600"></i>
                     </div>
                     <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Identity</p>
-                    <select id="userSelect" class="input-glow w-full p-3 rounded-xl text-base font-bold uppercase tracking-wider bg-black">
-                        </select>
+                    <select id="userSelect" class="input-glow w-full p-3 rounded-xl text-base font-bold uppercase tracking-wider bg-black"></select>
                 </div>
-                
                 <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glow w-full p-4 rounded-2xl font-mono text-3xl tracking-[0.5em] text-neonBlue" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                
-                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-neonBlue to-blue-600 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(0,243,255,0.25)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">
-                    Unlock Dashboard
-                </button>
-                
+                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-neonBlue to-blue-600 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(0,243,255,0.25)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Unlock Dashboard</button>
                 <div class="flex justify-between mt-8 px-2">
                     <button onclick="showRegister()" class="text-[10px] text-gray-500 hover:text-neonBlue transition-colors uppercase tracking-widest">+ Create Account</button>
                     <button onclick="resetSystem()" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
@@ -162,7 +148,7 @@
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest" id="headerUsername">User</p>
                 </div>
                 <div class="flex gap-4 text-xs uppercase tracking-widest font-bold">
-                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-3 py-2">Personal </button>
+                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-3 py-2">Personal</button>
                     <button onclick="switchTab('people')" id="btn-tab-people" class="tab-btn px-3 py-2">People</button>
                 </div>
                 <button onclick="logout()" class="text-gray-600 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full"><i class="fa-solid fa-power-off text-sm"></i></button>
@@ -241,15 +227,81 @@
             </div>
 
             <div id="tab-people-content" class="hidden animate-pop-in flex-col gap-8">
-                <div class="glass-panel rounded-[30px] p-1">
-                    <div class="bg-black/40 rounded-[28px] p-3 pl-6 flex items-center gap-4">
-                        <i class="fa-solid fa-user-plus text-neonBlue text-base"></i>
-                        <input type="text" id="newPersonName" placeholder="New Person Name..." class="bg-transparent border-none w-full text-white text-base focus:outline-none h-14">
-                        <button onclick="addPerson()" class="h-14 w-20 bg-neonBlue rounded-[22px] flex items-center justify-center text-black hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,243,255,0.3)]">
-                            <i class="fa-solid fa-arrow-right text-lg"></i>
-                        </button>
+                <div class="glass-panel p-6 rounded-[30px] relative overflow-hidden mb-2">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue/50 to-transparent"></div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Owed To Me (Normal)</p>
+                            <h2 class="text-3xl font-mono font-bold text-white">₹<span id="displayNormalReceivable">0</span></h2>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-neonBlue/10 flex items-center justify-center border border-neonBlue/20 text-neonBlue">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="openAddPersonMode('normal')" class="glass-panel p-4 rounded-[20px] flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition border-neonBlue/20">
+                        <i class="fa-solid fa-user-plus text-neonBlue text-xl"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Normal</span>
+                    </button>
+                    <button onclick="openAddPersonMode('interest')" class="glass-panel p-4 rounded-[20px] flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition border-neonPurple/20">
+                        <i class="fa-solid fa-percent text-neonPurple text-xl"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Interest</span>
+                    </button>
+                    <button onclick="openAddPersonMode('group')" class="glass-panel p-4 rounded-[20px] flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition border-neonGreen/20">
+                        <i class="fa-solid fa-users-viewfinder text-neonGreen text-xl"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Group</span>
+                    </button>
+                </div>
+
+                <div id="addPersonContainer" class="hidden glass-panel rounded-[30px] p-1 animate-slide-up">
+                   <div class="bg-black/40 rounded-[28px] p-4">
+                        <h3 id="addPersonTitle" class="text-xs text-gray-500 uppercase tracking-widest mb-3 ml-2">Adding Person</h3>
+                        <div class="flex flex-col gap-3">
+                            <input type="text" id="newPersonName" placeholder="Name or Group Title..." class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-base focus:outline-none focus:border-neonBlue w-full">
+                            
+                            <div id="interestOptions" class="hidden flex flex-col gap-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <select id="interestType" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                                        <option value="simple" class="bg-black">Simple Int.</option>
+                                        <option value="compound" class="bg-black">Compound Int.</option>
+                                    </select>
+                                    <div class="relative">
+                                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">% Rate</span>
+                                        <input type="number" id="interestRate" placeholder="Rate" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="flex gap-1">
+                                        <input type="number" id="interestTime" placeholder="Duration" class="bg-white/5 border border-white/10 rounded-l-xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                                        <select id="interestTimeUnit" class="bg-white/5 border border-white/10 border-l-0 rounded-r-xl px-2 h-12 text-white text-xs uppercase focus:outline-none w-20">
+                                            <option value="years" class="bg-black">Yrs</option>
+                                            <option value="months" class="bg-black">Mos</option>
+                                        </select>
+                                    </div>
+                                    <select id="interestFreq" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                                        <option value="monthly" class="bg-black">Monthly</option>
+                                        <option value="quarterly" class="bg-black">Quarterly</option>
+                                        <option value="half-yearly" class="bg-black">Half Yearly</option>
+                                        <option value="yearly" class="bg-black">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="groupOptions" class="hidden">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 ml-1">Select Members</p>
+                                <div id="groupMemberList" class="max-h-32 overflow-y-auto space-y-2 p-2 bg-white/5 rounded-xl border border-white/5 custom-scrollbar"></div>
+                            </div>
+
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="cancelAddPerson()" class="h-12 flex-1 rounded-xl border border-white/10 text-gray-500 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
+                                <button onclick="confirmAddPerson()" class="h-12 flex-1 bg-neonBlue rounded-xl text-black font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:bg-white">Save</button>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+
                 <div id="peopleGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 <div id="peopleEmptyState" class="hidden py-24 text-center">
                     <div class="w-24 h-24 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-5 border border-white/5">
@@ -270,33 +322,40 @@
                 <button onclick="deleteCurrentPerson()" class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 hover:bg-red-500/20"><i class="fa-solid fa-trash text-lg"></i></button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-10">
-                <div class="glass-panel p-10 rounded-full w-72 h-72 flex flex-col items-center justify-center relative border border-white/10 mt-6">
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-8">
+                <div class="glass-panel p-10 rounded-full w-72 h-72 flex flex-col items-center justify-center relative border border-white/10 mt-6 shrink-0">
                     <div class="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
                     <div class="absolute w-40 h-40 bg-neonBlue blur-[70px] opacity-10" id="detailGlow"></div>
                     <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-3 relative z-10">Net Standing</p>
-                    <div class="text-5xl font-mono font-bold text-white mb-3 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
-                    <div class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 relative z-10">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" id="detailStatus">Settled</p>
+                    <div class="text-5xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
+                    <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 relative z-10 flex flex-col items-center gap-1 min-w-[120px]">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" id="detailStatus">Settled</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5 w-full max-w-sm">
-                    <button onclick="openTransactionModal('GAVE')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#0a0505] border border-red-500/20 text-center transition-transform active:scale-95">
-                        <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
-                        <i class="fa-solid fa-arrow-up text-red-500 text-2xl mb-3"></i>
-                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Gave</p>
-                        <p class="text-[10px] text-red-500/60 mt-1">THEY OWE YOU</p>
-                    </button>
-                    <button onclick="openTransactionModal('GOT')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#050a0a] border border-neonBlue/20 text-center transition-transform active:scale-95">
+                <div id="detailedInterestCard" class="hidden w-full max-w-sm glass-panel p-5 rounded-2xl border border-neonPurple/20 relative group"></div>
+
+                <div id="detailedGroupMembers" class="hidden w-full max-w-sm">
+                    <h4 class="text-[10px] uppercase tracking-widest text-gray-500 mb-3 ml-2">Group Members</h4>
+                    <div id="groupMembersDisplay" class="space-y-2"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5 w-full max-w-sm shrink-0">
+                    <button onclick="openTransactionModal('GAVE')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#0a0505] border border-neonBlue/20 text-center transition-transform active:scale-95">
                         <div class="absolute inset-0 bg-neonBlue/5 group-hover:bg-neonBlue/10 transition-colors"></div>
-                        <i class="fa-solid fa-arrow-down text-neonBlue text-2xl mb-3"></i>
+                        <i class="fa-solid fa-arrow-up text-neonBlue text-2xl mb-3"></i>
+                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Gave</p>
+                        <p class="text-[10px] text-neonBlue/60 mt-1">THEY OWE YOU</p>
+                    </button>
+                    <button onclick="openTransactionModal('GOT')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#050a0a] border border-red-500/20 text-center transition-transform active:scale-95">
+                        <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
+                        <i class="fa-solid fa-arrow-down text-red-500 text-2xl mb-3"></i>
                         <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Got</p>
-                        <p class="text-[10px] text-neonBlue/60 mt-1">REPAYMENT</p>
+                        <p class="text-[10px] text-red-500/60 mt-1">REPAYMENT</p>
                     </button>
                 </div>
 
-                <div class="w-full max-w-md pb-12">
+                <div class="w-full max-w-md pb-12 shrink-0">
                     <h3 class="text-xs text-gray-600 font-bold uppercase mb-5 ml-2 tracking-widest">History Log</h3>
                     <div id="personHistoryList" class="space-y-4"></div>
                 </div>
@@ -320,6 +379,43 @@
             </div>
         </div>
 
+        <div id="editInterestModal" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-sm p-6 rounded-[30px] border border-white/20 animate-pop-in relative">
+                <h3 class="text-sm font-bold mb-6 uppercase tracking-widest text-center text-white">Edit Interest Details</h3>
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="editInterestType" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="simple" class="bg-black">Simple Int.</option>
+                            <option value="compound" class="bg-black">Compound Int.</option>
+                        </select>
+                        <div class="relative">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">% Rate</span>
+                            <input type="number" id="editInterestRate" placeholder="Rate" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex gap-1">
+                            <input type="number" id="editInterestTime" placeholder="Duration" class="bg-white/5 border border-white/10 rounded-l-xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                            <select id="editInterestTimeUnit" class="bg-white/5 border border-white/10 border-l-0 rounded-r-xl px-2 h-12 text-white text-xs uppercase focus:outline-none w-20">
+                                <option value="years" class="bg-black">Yrs</option>
+                                <option value="months" class="bg-black">Mos</option>
+                            </select>
+                        </div>
+                        <select id="editInterestFreq" class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="monthly" class="bg-black">Monthly</option>
+                            <option value="quarterly" class="bg-black">Quarterly</option>
+                            <option value="half-yearly" class="bg-black">Half Yearly</option>
+                            <option value="yearly" class="bg-black">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="closeEditInterestModal()" class="h-12 flex-1 rounded-xl border border-white/10 text-gray-500 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
+                        <button onclick="updateInterestDetails()" class="h-12 flex-1 bg-neonPurple rounded-xl text-white font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(191,0,255,0.3)] hover:scale-[1.02] transition-transform">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="monthlyStatsModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
             <div class="glass-panel w-full max-w-sm p-8 rounded-[30px] border border-white/20 animate-pop-in relative flex flex-col max-h-[80vh]">
                 <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-center text-neonPurple">Monthly Breakdown</h3>
@@ -327,7 +423,6 @@
                 <button onclick="closeMonthlyStats()" class="mt-6 py-4 w-full rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition">CLOSE</button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -337,47 +432,20 @@
         let expensesData = { budget: 0, list: [] };
         let peopleData = []; 
         let activePersonId = null, activeTxType = null; 
+        let currentAddMode = null; 
 
         window.onload = function() { initSystem(); };
 
         function initSystem() {
-            // MIGRATION: Check if old single-user data exists
-            const legacyUser = localStorage.getItem('neonFlux_user');
             const registry = localStorage.getItem('neonFlux_registry');
-            
-            if (legacyUser && !registry) {
-                // Perform migration
-                const oldUser = JSON.parse(legacyUser);
-                const oldExp = localStorage.getItem('neonFlux_expenses_v2');
-                const oldPpl = localStorage.getItem('neonFlux_people_v2');
-                
-                const newId = 'legacy_' + Date.now();
-                const newUser = { id: newId, name: oldUser.name, pin: oldUser.pin };
-                
-                userRegistry = [newUser];
-                localStorage.setItem('neonFlux_registry', JSON.stringify(userRegistry));
-                
-                if(oldExp) localStorage.setItem('neonFlux_expenses_' + newId, oldExp);
-                if(oldPpl) localStorage.setItem('neonFlux_people_' + newId, oldPpl);
-                
-                // Cleanup old keys
-                localStorage.removeItem('neonFlux_user');
-                localStorage.removeItem('neonFlux_expenses_v2');
-                localStorage.removeItem('neonFlux_people_v2');
-            } else {
-                if(registry) userRegistry = JSON.parse(registry);
-            }
-
+            if(registry) userRegistry = JSON.parse(registry);
             renderAuthScreen();
         }
 
         function renderAuthScreen() {
             document.getElementById('login-view').classList.remove('view-hidden');
-            if (userRegistry.length === 0) {
-                showRegister();
-            } else {
-                showLogin();
-            }
+            if (userRegistry.length === 0) showRegister();
+            else showLogin();
         }
 
         function showRegister() {
@@ -389,7 +457,6 @@
             document.getElementById('login-register').classList.add('view-hidden');
             const authDiv = document.getElementById('login-auth');
             authDiv.classList.remove('view-hidden');
-            
             const select = document.getElementById('userSelect');
             select.innerHTML = '';
             userRegistry.forEach(u => {
@@ -404,17 +471,9 @@
             const name = document.getElementById('regName').value.trim();
             const pin = document.getElementById('regPin').value.trim();
             if (!name || pin.length !== 4) return alert("Name & 4-digit PIN required");
-            
-            const newUser = {
-                id: 'u_' + Date.now(),
-                name: name,
-                pin: pin
-            };
-            
+            const newUser = { id: 'u_' + Date.now(), name: name, pin: pin };
             userRegistry.push(newUser);
             localStorage.setItem('neonFlux_registry', JSON.stringify(userRegistry));
-            
-            // Auto-login
             currentUser = newUser;
             loadApp();
         }
@@ -422,9 +481,7 @@
         function authenticateUser() {
             const selectedId = document.getElementById('userSelect').value;
             const pinField = document.getElementById('authPin');
-            
             const user = userRegistry.find(u => u.id === selectedId);
-            
             if (user && pinField.value.trim() === user.pin) {
                 currentUser = user;
                 loadApp();
@@ -489,11 +546,9 @@
             const ring = document.getElementById('ring-progress');
             ring.style.strokeDasharray = `${Math.max(0, 100 - percent)}, 100`;
             ring.style.stroke = remaining < 0 ? '#ff3333' : '#00f3ff';
-            
             document.getElementById('displayBalance').innerText = formatMoney(remaining);
             document.getElementById('displaySpent').innerText = formatMoney(total);
             document.getElementById('budgetInput').value = expensesData.budget;
-
             const listEl = document.getElementById('expenseList');
             listEl.innerHTML = '';
             if(expensesData.list.length === 0) {
@@ -535,22 +590,16 @@
             const listEl = document.getElementById('monthlyStatsList');
             listEl.innerHTML = '';
             const sortedMonths = Object.keys(stats).sort((a,b) => months.indexOf(a) - months.indexOf(b));
-            if(sortedMonths.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Data Recorded</p>';
-            } else {
+            if(sortedMonths.length === 0) listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Data Recorded</p>';
+            else {
                 sortedMonths.forEach(m => {
-                    listEl.innerHTML += `
-                        <div class="flex justify-between items-center bg-white/5 p-5 rounded-xl border border-white/5">
-                            <span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span>
-                            <span class="text-neonPurple font-mono font-bold text-lg">₹${formatMoney(stats[m])}</span>
-                        </div>`;
+                    listEl.innerHTML += `<div class="flex justify-between items-center bg-white/5 p-5 rounded-xl border border-white/5"><span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span><span class="text-neonPurple font-mono font-bold text-lg">₹${formatMoney(stats[m])}</span></div>`;
                 });
             }
             document.getElementById('monthlyStatsModal').classList.remove('hidden');
         }
 
         function closeMonthlyStats() { document.getElementById('monthlyStatsModal').classList.add('hidden'); }
-
         function exportCSV() {
             let csv = "Date,Name,Amount\n";
             expensesData.list.forEach(item => csv += `${item.date},${item.name},${item.amount}\n`);
@@ -563,20 +612,130 @@
         }
 
         function renderPeopleGrid() {
+            updateNormalReceivableDisplay();
             const grid = document.getElementById('peopleGrid');
             grid.innerHTML = '';
             if(peopleData.length === 0) document.getElementById('peopleEmptyState').classList.remove('hidden');
             else {
                 document.getElementById('peopleEmptyState').classList.add('hidden');
                 peopleData.forEach(p => {
-                    let bal = 0; p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
-                    grid.innerHTML += `
-                        <div onclick="openPersonDetails(${p.id})" class="glass-panel p-6 rounded-[24px] border ${bal >= 0 ? 'border-neonBlue/20' : 'border-red-500/20'} cursor-pointer hover:scale-[1.02] transition-transform">
-                            <h3 class="text-xl font-bold">${p.name}</h3>
-                            <p class="text-3xl font-mono ${bal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(bal))}</p>
-                        </div>`;
+                    let bal = 0;
+                    if(p.isGroup) {
+                         p.members.forEach(mId => {
+                             const m = peopleData.find(x => x.id === mId);
+                             if(m) {
+                                 m.transactions.forEach(t => {
+                                     if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) {
+                                         bal += (t.type==='GAVE'?t.amount:-t.amount);
+                                     }
+                                 });
+                             }
+                         });
+                    } else {
+                        p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
+                    }
+                    let badge = '';
+                    if(p.isGroup) badge = `<span class="absolute top-4 right-4 text-[9px] text-neonGreen border border-neonGreen/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">Group</span>`;
+                    else if(p.interestMode && p.interestMode !== 'none') badge = `<span class="absolute top-4 right-4 text-[9px] text-neonPurple border border-neonPurple/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">${p.interestMode}</span>`;
+                    else if(p.id === 'myself') badge = `<span class="absolute top-4 right-4 text-[9px] text-white border border-white/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">Me</span>`;
+                    grid.innerHTML += `<div onclick="openPersonDetails(${p.id === 'myself' ? "'myself'" : p.id})" class="glass-panel p-6 rounded-[24px] border ${bal >= 0 ? 'border-neonBlue/20' : 'border-red-500/20'} cursor-pointer hover:scale-[1.02] transition-transform relative">${badge}<h3 class="text-xl font-bold">${p.name}</h3><p class="text-3xl font-mono ${bal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(bal))}</p></div>`;
                 });
             }
+        }
+
+        function updateNormalReceivableDisplay() {
+            let totalOthersOweMe = 0;
+            peopleData.forEach(p => {
+                if (!p.isGroup && (!p.interestMode || p.interestMode === 'none') && p.id !== 'myself') {
+                    let bal = 0;
+                    p.transactions.forEach(t => bal += (t.type === 'GAVE' ? t.amount : -t.amount));
+                    if (bal > 0) totalOthersOweMe += bal;
+                }
+            });
+            document.getElementById('displayNormalReceivable').innerText = formatMoney(totalOthersOweMe);
+        }
+
+        function openAddPersonMode(mode) {
+            currentAddMode = mode;
+            document.getElementById('addPersonContainer').classList.remove('hidden');
+            document.getElementById('newPersonName').value = '';
+            document.getElementById('interestOptions').classList.add('hidden');
+            document.getElementById('groupOptions').classList.add('hidden');
+            document.getElementById('addPersonTitle').innerText = 'Adding Normal';
+            if(mode === 'interest') {
+                 document.getElementById('addPersonTitle').innerText = 'Adding w/ Interest';
+                 document.getElementById('interestOptions').classList.remove('hidden');
+                 document.getElementById('interestRate').value = '';
+                 document.getElementById('interestTime').value = '';
+            } else if (mode === 'group') {
+                 document.getElementById('addPersonTitle').innerText = 'Creating Group';
+                 document.getElementById('groupOptions').classList.remove('hidden');
+                 populateGroupMemberList();
+            }
+        }
+
+        function populateGroupMemberList() {
+            const list = document.getElementById('groupMemberList');
+            list.innerHTML = '';
+            const eligible = peopleData.filter(p => !p.isGroup && (!p.interestMode || p.interestMode === 'none'));
+            if(eligible.length === 0) {
+                list.innerHTML = '<p class="text-center text-xs text-gray-500">No normal members found.</p>';
+            } else {
+                eligible.forEach(p => {
+                    list.innerHTML += `<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer"><input type="checkbox" class="group-member-cb accent-neonGreen w-4 h-4" value="${p.id}"><span class="text-sm text-gray-300 font-bold">${p.name}</span></label>`;
+                });
+            }
+        }
+
+        function cancelAddPerson() {
+            document.getElementById('addPersonContainer').classList.add('hidden');
+            currentAddMode = null;
+        }
+
+        function confirmAddPerson() {
+            const name = document.getElementById('newPersonName').value.trim();
+            if(!name) return;
+            let personObj = { id: Date.now(), name, transactions: [], interestMode: 'none', interestRate: 0, timeValue: 0, timeUnit: 'years', interestFreq: 'yearly', isGroup: false, members: [] };
+            if(currentAddMode === 'interest') {
+                const type = document.getElementById('interestType').value;
+                const rate = parseFloat(document.getElementById('interestRate').value);
+                const timeVal = parseFloat(document.getElementById('interestTime').value);
+                const timeUnit = document.getElementById('interestTimeUnit').value;
+                const freq = document.getElementById('interestFreq').value;
+                if(isNaN(rate) || rate < 0 || isNaN(timeVal) || timeVal < 0) return alert("Valid rate and duration required");
+                personObj.interestMode = type; personObj.interestRate = rate; personObj.timeValue = timeVal; personObj.timeUnit = timeUnit; personObj.interestFreq = freq;
+            } else if (currentAddMode === 'group') {
+                const checkboxes = document.querySelectorAll('.group-member-cb:checked');
+                if(checkboxes.length < 2) return alert("Select at least 2 members");
+                personObj.isGroup = true;
+                checkboxes.forEach(cb => personObj.members.push(cb.value === 'myself' ? 'myself' : parseInt(cb.value)));
+            }
+            peopleData.push(personObj);
+            saveAll(); renderPeopleGrid(); cancelAddPerson();
+        }
+
+        function openEditInterestModal() {
+            const p = peopleData.find(x => x.id === activePersonId);
+            if(!p) return;
+            document.getElementById('editInterestType').value = p.interestMode;
+            document.getElementById('editInterestRate').value = p.interestRate;
+            document.getElementById('editInterestTime').value = p.timeValue;
+            document.getElementById('editInterestTimeUnit').value = p.timeUnit;
+            document.getElementById('editInterestFreq').value = p.interestFreq;
+            document.getElementById('editInterestModal').classList.remove('hidden');
+        }
+
+        function closeEditInterestModal() { document.getElementById('editInterestModal').classList.add('hidden'); }
+
+        function updateInterestDetails() {
+            const p = peopleData.find(x => x.id === activePersonId);
+            if(!p) return;
+            const rate = parseFloat(document.getElementById('editInterestRate').value);
+            const timeVal = parseFloat(document.getElementById('editInterestTime').value);
+            if(isNaN(rate) || rate < 0 || isNaN(timeVal) || timeVal < 0) return alert("Invalid inputs");
+            p.interestMode = document.getElementById('editInterestType').value;
+            p.interestRate = rate; p.timeValue = timeVal; p.timeUnit = document.getElementById('editInterestTimeUnit').value; p.interestFreq = document.getElementById('editInterestFreq').value;
+            saveAll(); closeEditInterestModal(); renderPersonDetailsInternal(p);
         }
 
         function openPersonDetails(id) {
@@ -587,40 +746,55 @@
         }
 
         function renderPersonDetailsInternal(p) {
-            let bal = 0; p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
-            document.getElementById('detailBalance').innerText = `₹${formatMoney(Math.abs(bal))}`;
-            document.getElementById('detailStatus').innerText = bal > 0 ? 'OWES YOU' : (bal < 0 ? 'YOU OWE' : 'SETTLED');
-            
+            let principal = 0; 
+            const detailCard = document.getElementById('detailedInterestCard');
+            const groupCard = document.getElementById('detailedGroupMembers');
+            detailCard.classList.add('hidden'); groupCard.classList.add('hidden');
             const list = document.getElementById('personHistoryList'); 
             list.innerHTML = '';
-            
+
+            if(p.isGroup) {
+                 groupCard.classList.remove('hidden');
+                 const membersDiv = document.getElementById('groupMembersDisplay');
+                 membersDiv.innerHTML = '';
+                 p.members.forEach(mId => {
+                     const m = peopleData.find(x => x.id === mId);
+                     if(m) {
+                         let mBal = 0;
+                         m.transactions.forEach(t => {
+                             if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) {
+                                 mBal += (t.type==='GAVE'?t.amount:-t.amount);
+                             }
+                         });
+                         membersDiv.innerHTML += `<div class="flex justify-between items-center bg-white/5 p-2 px-3 rounded-lg border border-white/5"><span class="text-xs text-gray-300 font-bold">${m.name}</span><span class="text-xs font-mono font-bold ${mBal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(mBal))}</span></div>`;
+                         principal += mBal; 
+                     }
+                 });
+                 list.innerHTML = '<p class="text-center text-xs text-gray-500 py-4">Transactions split in member ledgers.</p>';
+                 document.getElementById('detailBalance').innerText = `₹${formatMoney(Math.abs(principal))}`;
+                 document.getElementById('detailStatus').innerText = principal > 0 ? 'GROUP OWES' : (principal < 0 ? 'YOU OWE' : 'SETTLED');
+                 return; 
+            }
+
+            p.transactions.forEach(t => principal += (t.type==='GAVE'?t.amount:-t.amount));
+            let finalAmount = principal;
+            if(p.interestMode && p.interestMode !== 'none' && Math.abs(principal) > 0) {
+                let timeInYears = p.timeUnit === 'months' ? p.timeValue / 12 : p.timeValue;
+                let n = p.interestFreq === 'monthly' ? 12 : (p.interestFreq === 'quarterly' ? 4 : (p.interestFreq === 'half-yearly' ? 2 : 1));
+                let r = p.interestRate / 100, debt = Math.abs(principal), interestAmount = 0;
+                if(p.interestMode === 'simple') interestAmount = debt * r * timeInYears;
+                else interestAmount = (debt * Math.pow((1 + (r/n)), (n * timeInYears))) - debt;
+                finalAmount = principal > 0 ? principal + interestAmount : principal - interestAmount;
+                detailCard.innerHTML = `<button onclick="openEditInterestModal()" class="absolute top-3 right-3 w-8 h-8 bg-white/5 rounded-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-pen text-xs"></i></button><div class="grid grid-cols-2 gap-y-3 text-[10px] uppercase tracking-widest"><div class="text-gray-500">Principal</div><div class="text-right font-bold text-white text-xs">₹${formatMoney(debt)}</div><div class="text-gray-500">Rate</div><div class="text-right font-bold text-white">${p.interestRate}% (${p.interestMode})</div><div class="text-gray-500">Interest</div><div class="text-right font-bold text-neonPurple text-sm">₹${formatMoney(interestAmount)}</div></div>`;
+                detailCard.classList.remove('hidden');
+            } 
+
+            document.getElementById('detailBalance').innerText = `₹${formatMoney(Math.abs(finalAmount))}`;
+            document.getElementById('detailStatus').innerText = finalAmount > 0 ? 'OWES YOU' : (finalAmount < 0 ? 'YOU OWE' : 'SETTLED');
             p.transactions.sort((a,b) => b.id - a.id).forEach(t => {
                 const isGave = t.type === 'GAVE';
-                list.innerHTML += `
-                    <div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up">
-                        <div class="flex items-center gap-4">
-                            <div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 min-w-[65px]">
-                                <p class="text-xs font-black text-white leading-tight uppercase tracking-tighter">${t.date}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p>
-                                <p class="text-[10px] font-bold ${isGave ? 'text-red-400' : 'text-neonBlue'} uppercase tracking-widest">${t.type}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p>
-                            <button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors">DEL</button>
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 min-w-[65px]"><p class="text-xs font-black text-white uppercase">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div>`;
             });
-        }
-
-        function addPerson() {
-            const name = document.getElementById('newPersonName').value.trim();
-            if(!name) return;
-            peopleData.push({ id: Date.now(), name, transactions: [] });
-            document.getElementById('newPersonName').value = '';
-            saveAll(); renderPeopleGrid();
         }
 
         function saveAll() {
@@ -631,44 +805,72 @@
 
         function loadData() {
             if(!currentUser) return;
-            expensesData = { budget: 0, list: [] };
-            peopleData = [];
+            expensesData = { budget: 0, list: [] }; peopleData = [];
             const e = localStorage.getItem('neonFlux_expenses_' + currentUser.id); if(e) expensesData = JSON.parse(e);
             const p = localStorage.getItem('neonFlux_people_' + currentUser.id); if(p) peopleData = JSON.parse(p);
+            if (!peopleData.some(x => x.id === 'myself')) {
+                peopleData.push({ id: 'myself', name: 'Myself', transactions: [], interestMode: 'none', isGroup: false });
+                saveAll();
+            }
         }
 
-        function formatMoney(amount) {
-            return new Intl.NumberFormat('en-IN').format(Math.round(amount));
-        }
-
-        function logout() { 
-            currentUser = null; 
-            document.getElementById('app-view').classList.add('view-hidden');
-            document.getElementById('login-view').style.display = 'flex';
-            renderAuthScreen();
-        }
-        
-        function resetSystem() { 
-            if(confirm("DANGER: This will delete ALL users and ALL data on this device. Continue?")) { 
-                localStorage.clear(); 
-                window.location.reload(); 
-            } 
-        }
-        
+        function formatMoney(amount) { return new Intl.NumberFormat('en-IN').format(Math.round(amount)); }
+        function logout() { currentUser = null; document.getElementById('app-view').classList.add('view-hidden'); document.getElementById('login-view').style.display = 'flex'; renderAuthScreen(); }
+        function resetSystem() { if(confirm("DANGER: This will delete ALL users and data. Continue?")) { localStorage.clear(); window.location.reload(); } }
         function closePersonDetails() { document.getElementById('personDetailOverlay').classList.replace('open','closed'); renderPeopleGrid(); }
         function deleteExpense(id) { if(confirm("Delete this expense?")) { expensesData.list = expensesData.list.filter(e => e.id !== id); saveAll(); renderExpenses(); } }
-        function delTx(id) { if(confirm("Delete this record?")) { const p = peopleData.find(x=>x.id===activePersonId); p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); } }
-        function deleteCurrentPerson() { if(confirm("Delete this ledger entirely?")) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } }
+        function delTx(id) { 
+            if(confirm("Delete this record?")) { 
+                const p = peopleData.find(x=>x.id===activePersonId); 
+                if(p && !p.isGroup) { p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); }
+            } 
+        }
+        function deleteCurrentPerson() { 
+            if(activePersonId === 'myself') return alert("Cannot delete 'Myself' ledger.");
+            if(confirm("Delete this entire ledger?")) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } 
+        }
         function resetExpenses() { if(confirm("Clear all expenses?")) { expensesData.list = []; saveAll(); renderExpenses(); } }
-
         function openTransactionModal(type) { activeTxType=type; document.getElementById('txModalType').innerText = type; document.getElementById('txInputModal').classList.remove('hidden'); }
         function closeTxModal() { document.getElementById('txInputModal').classList.add('hidden'); document.getElementById('txDesc').value=''; document.getElementById('txAmt').value=''; }
+        
         function submitPersonTx() {
             const amt = parseFloat(document.getElementById('txAmt').value);
             if(isNaN(amt)||amt<=0) return;
             const p = peopleData.find(x=>x.id===activePersonId);
-            p.transactions.push({id:Date.now(), type:activeTxType, amount:amt, desc:document.getElementById('txDesc').value, date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'})});
-            saveAll(); closeTxModal(); renderPersonDetailsInternal(p);
+            const desc = document.getElementById('txDesc').value;
+            const now = Date.now(), dateStr = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+            
+            // LOGIC: Subtract from Personal balance if "I GAVE" to Myself, Group, or Normal Persons
+            if (activeTxType === 'GAVE') {
+                const isNormalPerson = !p.isGroup && (!p.interestMode || p.interestMode === 'none');
+                const isMyself = p.id === 'myself';
+                const isGroup = p.isGroup;
+                
+                if (isNormalPerson || isMyself || isGroup) {
+                    expensesData.list.unshift({
+                        id: Date.now() + 1,
+                        name: `subtracted from ${p.name}`,
+                        amount: amt,
+                        date: dateStr,
+                        icon: 'fa-money-bill-transfer'
+                    });
+                }
+            }
+
+            if(p.isGroup) {
+                const splitAmt = amt / p.members.length;
+                p.members.forEach(mId => {
+                    const m = peopleData.find(x => x.id === mId);
+                    if(m) m.transactions.push({ id: now + Math.random(), type: activeTxType, amount: splitAmt, desc: `(Group: ${p.name}) ${desc}`, date: dateStr });
+                });
+            } else {
+                p.transactions.push({ id: now, type: activeTxType, amount: amt, desc: desc, date: dateStr });
+            }
+            
+            saveAll(); 
+            closeTxModal(); 
+            renderPersonDetailsInternal(p);
+            if (currentTab === 'expenses') renderExpenses();
         }
     </script>
 </body>
