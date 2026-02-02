@@ -694,10 +694,8 @@
             
             dataList.forEach(item => {
                 const parts = item.date.split(' ');
-                // Assuming date starts with "2 Feb" or "02 Feb"
                 let month = '';
                 if(parts.length > 1) {
-                    // Handle "2 Feb, 10:30 PM" format
                     const possibleMonth = parts[1].replace(',', '');
                     if (months.includes(possibleMonth)) month = possibleMonth;
                 }
@@ -716,27 +714,46 @@
                 container.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No History Available</p>';
             } else {
                 sortedMonths.forEach(m => {
-                    let txHtml = '';
                     let monthTotal = 0;
-
+                    let txHtml = '';
+                    
+                    let dailyGroups = {};
                     grouped[m].forEach(t => {
                         monthTotal += t.amount;
-                        if(mode === 'expense') {
-                             txHtml += `
-                            <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div>
-                                    <div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div>
-                                </div>
-                                <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
-                            </div>`;
-                        } else {
-                             txHtml += `
-                            <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0">
-                                <div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div>
-                                <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
-                            </div>`;
-                        }
+                        let dateKey = t.date.split(',')[0].trim();
+                        if (!dailyGroups[dateKey]) dailyGroups[dateKey] = { total: 0, list: [] };
+                        dailyGroups[dateKey].total += t.amount;
+                        dailyGroups[dateKey].list.push(t);
+                    });
+
+                    const sortedDays = Object.keys(dailyGroups).sort((a, b) => parseInt(b) - parseInt(a));
+
+                    sortedDays.forEach(day => {
+                        txHtml += `
+                            <div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span>
+                                <span class="text-[10px] font-mono font-bold text-neonBlue">₹${formatMoney(dailyGroups[day].total)}</span>
+                            </div>
+                        `;
+
+                        dailyGroups[day].list.forEach(t => {
+                            if(mode === 'expense') {
+                                txHtml += `
+                                <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div>
+                                        <div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div>
+                                    </div>
+                                    <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
+                                </div>`;
+                            } else {
+                                txHtml += `
+                                <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4">
+                                    <div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div>
+                                    <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
+                                </div>`;
+                            }
+                        });
                     });
 
                     let summaryBadge = '';
@@ -994,14 +1011,35 @@
 
             p.transactions.forEach(t => principal += (t.type==='GAVE'?t.amount:-t.amount));
             let finalAmount = principal;
+
             if(p.interestMode && p.interestMode !== 'none' && Math.abs(principal) > 0) {
-                let timeInYears = p.timeUnit === 'months' ? p.timeValue / 12 : p.timeValue;
-                let n = p.interestFreq === 'monthly' ? 12 : (p.interestFreq === 'quarterly' ? 4 : (p.interestFreq === 'half-yearly' ? 2 : 1));
-                let r = p.interestRate / 100, debt = Math.abs(principal), interestAmount = 0;
-                if(p.interestMode === 'simple') interestAmount = debt * r * timeInYears;
-                else interestAmount = (debt * Math.pow((1 + (r/n)), (n * timeInYears))) - debt;
+                // Determine months per cycle based on frequency
+                let monthsPerCycle = 1; // monthly
+                if (p.interestFreq === 'quarterly') monthsPerCycle = 3;
+                else if (p.interestFreq === 'half-yearly') monthsPerCycle = 6;
+                else if (p.interestFreq === 'yearly') monthsPerCycle = 12;
+
+                // Total duration in months
+                let durationInMonths = p.timeUnit === 'years' ? p.timeValue * 12 : p.timeValue;
+                
+                // Total compounding/calculation cycles
+                let totalCycles = durationInMonths / monthsPerCycle;
+                
+                // Rate is treated as periodic rate as per user requirement
+                let r = p.interestRate / 100;
+                let debt = Math.abs(principal);
+                let interestAmount = 0;
+
+                if (p.interestMode === 'simple') {
+                    // Simple Interest: P * R * T (where T is number of cycles)
+                    interestAmount = debt * r * totalCycles;
+                } else {
+                    // Compound Interest: P * (1 + R)^T - P
+                    interestAmount = (debt * Math.pow((1 + r), totalCycles)) - debt;
+                }
+
                 finalAmount = principal > 0 ? principal + interestAmount : principal - interestAmount;
-                detailCard.innerHTML = `<button onclick="openEditInterestModal()" class="absolute top-3 right-3 w-8 h-8 bg-white/5 rounded-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-pen text-xs"></i></button><div class="grid grid-cols-2 gap-y-3 text-[10px] uppercase tracking-widest"><div class="text-gray-500">Principal</div><div class="text-right font-bold text-white text-xs">₹${formatMoney(debt)}</div><div class="text-gray-500">Rate</div><div class="text-right font-bold text-white">${p.interestRate}% (${p.interestMode})</div><div class="text-gray-500">Interest</div><div class="text-right font-bold text-neonPurple text-sm">₹${formatMoney(interestAmount)}</div></div>`;
+                detailCard.innerHTML = `<button onclick="openEditInterestModal()" class="absolute top-3 right-3 w-8 h-8 bg-white/5 rounded-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-pen text-xs"></i></button><div class="grid grid-cols-2 gap-y-3 text-[10px] uppercase tracking-widest"><div class="text-gray-500">Principal</div><div class="text-right font-bold text-white text-xs">₹${formatMoney(debt)}</div><div class="text-gray-500">Rate</div><div class="text-right font-bold text-white">${p.interestRate}% / ${p.interestFreq}</div><div class="text-gray-500">Interest</div><div class="text-right font-bold text-neonPurple text-sm">₹${formatMoney(interestAmount)}</div></div>`;
                 detailCard.classList.remove('hidden');
             } 
 
@@ -1164,7 +1202,6 @@
             
             const now = Date.now();
             const d = new Date();
-            // Added TIME to the date string
             const dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ', ' + d.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
             
             if (activeTxType === 'GAVE') {
