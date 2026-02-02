@@ -566,9 +566,14 @@
             const name = document.getElementById('expenseName').value.trim();
             const amt = parseFloat(document.getElementById('expenseAmount').value);
             if(!name || isNaN(amt) || amt <= 0) return;
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+            const timeStr = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
+            
             expensesData.list.unshift({
                 id: Date.now(), name, amount: amt,
-                date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'}),
+                date: `${dateStr}, ${timeStr}`,
                 icon: getIconForExpense(name)
             });
             document.getElementById('expenseName').value = ''; 
@@ -689,8 +694,15 @@
             
             dataList.forEach(item => {
                 const parts = item.date.split(' ');
+                // Assuming date starts with "2 Feb" or "02 Feb"
+                let month = '';
                 if(parts.length > 1) {
-                    const month = parts[1];
+                    // Handle "2 Feb, 10:30 PM" format
+                    const possibleMonth = parts[1].replace(',', '');
+                    if (months.includes(possibleMonth)) month = possibleMonth;
+                }
+                
+                if(month) {
                     if(!grouped[month]) grouped[month] = [];
                     grouped[month].push(item);
                 }
@@ -772,8 +784,13 @@
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             expensesData.list.forEach(item => {
                 const parts = item.date.split(' ');
+                let month = '';
                 if(parts.length > 1) {
-                    const month = parts[1];
+                    const possibleMonth = parts[1].replace(',', '');
+                    if (months.includes(possibleMonth)) month = possibleMonth;
+                }
+                
+                if(month) {
                     if(!stats[month]) stats[month] = 0;
                     stats[month] += item.amount;
                 }
@@ -996,7 +1013,7 @@
 
             currentItems.sort((a,b) => b.id - a.id).forEach(t => {
                 const isGave = t.type === 'GAVE';
-                list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 min-w-[65px]"><p class="text-xs font-black text-white uppercase">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div>`;
+                list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 w-auto min-w-[65px]"><p class="text-xs font-black text-white uppercase leading-tight">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div>`;
             });
             if(currentItems.length === 0) {
                  list.innerHTML = '<p class="text-center text-xs text-gray-500 py-6 uppercase tracking-widest">No Recent Transactions</p>';
@@ -1012,8 +1029,13 @@
             
             p.transactions.forEach(t => {
                 const parts = t.date.split(' ');
+                let month = '';
                 if(parts.length > 1) {
-                    const month = parts[1];
+                    const possibleMonth = parts[1].replace(',', '');
+                    if (months.includes(possibleMonth)) month = possibleMonth;
+                }
+
+                if(month) {
                     if(!stats[month]) stats[month] = { gave: 0, got: 0 };
                     if(t.type === 'GAVE') stats[month].gave += t.amount;
                     else stats[month].got += t.amount;
@@ -1139,16 +1161,18 @@
             if(isNaN(amt)||amt<=0) return;
             const p = peopleData.find(x=>x.id===activePersonId);
             const desc = document.getElementById('txDesc').value;
-            const now = Date.now(), dateStr = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short'});
             
-            // Logic to add to main expenses (ONLY if NOT a General ledger)
+            const now = Date.now();
+            const d = new Date();
+            // Added TIME to the date string
+            const dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ', ' + d.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
+            
             if (activeTxType === 'GAVE') {
                 const isNormalPerson = !p.isGroup && (!p.interestMode || p.interestMode === 'none');
                 const isMyself = p.id === 'myself';
                 const isGroup = p.isGroup;
                 const isGeneral = p.isGeneral === true; 
 
-                // We add to personal expenses ONLY if it's NOT a general ledger
                 if ((isNormalPerson || isMyself || isGroup) && !isGeneral) {
                     expensesData.list.unshift({
                         id: Date.now() + 1,
