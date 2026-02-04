@@ -111,6 +111,20 @@
 </head>
 <body class="min-h-screen text-base text-gray-100 font-sans selection:bg-neonPink selection:text-white pb-6 overflow-x-hidden">
 
+    <div id="confirm-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
+        <div class="glass-panel w-full max-w-xs p-8 rounded-[30px] border border-white/20 text-center animate-pop-in relative">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 mx-auto flex items-center justify-center mb-6">
+                <i class="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
+            </div>
+            <h3 class="text-white font-bold text-lg mb-2 uppercase tracking-tight" id="confirm-title">Are you sure?</h3>
+            <p class="text-gray-400 text-xs mb-8 leading-relaxed" id="confirm-message">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button id="confirm-cancel" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:bg-white/10">Cancel</button>
+                <button id="confirm-yes" class="py-3.5 rounded-xl bg-red-500 text-white font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:scale-[1.02] transition-transform">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#020202]">
         <div class="glass-panel w-full max-w-sm p-10 rounded-[30px] border-t border-white/20 text-center animate-pop-in relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue via-white to-neonPink opacity-50"></div>
@@ -211,13 +225,19 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center px-4 mb-3">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Transaction Log</h3>
-                        <div class="flex gap-2">
-                            <button onclick="showMonthlyStats()" class="text-[10px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Monthly</button>
-                            <button onclick="showHistory()" class="text-[10px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-clock-rotate-left mr-1"></i> History</button>
-                            <button onclick="exportCSV()" class="text-[10px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-download mr-1"></i> Export</button>
-                            <button onclick="resetExpenses()" class="text-[10px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded-md">Clear</button>
+                    <div class="flex flex-col gap-4 px-4 mb-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Transaction Log</h3>
+                            <div class="flex gap-2">
+                                <button onclick="showMonthlyStats()" class="text-[10px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Monthly</button>
+                                <button onclick="showHistory()" class="text-[10px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-clock-rotate-left mr-1"></i> History</button>
+                                <button onclick="exportCSV()" class="text-[10px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-download mr-1"></i> Export</button>
+                                <button onclick="resetExpenses()" class="text-[10px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded-md">Clear</button>
+                            </div>
+                        </div>
+                        <div class="relative w-full">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
+                            <input type="text" id="expenseSearch" oninput="filterExpenses()" placeholder="SEARCH BY NAME OR DATE..." class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-neonBlue transition-all">
                         </div>
                     </div>
                     <div class="glass-panel rounded-[30px] overflow-hidden min-h-[300px]">
@@ -230,10 +250,16 @@
                 </div>
             </div>
 
-            <div id="tab-people-content" class="hidden animate-pop-in flex flex-col gap-8">
+            <div id="tab-people-content" class="hidden animate-pop-in flex flex-col gap-6">
+                
+                <button onclick="openManual()" class="w-full py-3 rounded-2xl bg-white/5 border border-neonYellow/30 text-neonYellow font-bold text-xs uppercase tracking-[0.2em] hover:bg-neonYellow/10 transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(243,255,0,0.1)]">
+                    <i class="fa-solid fa-circle-question text-base"></i>
+                    <span>How Ledger Categories Work</span>
+                </button>
+
                 <div class="glass-panel p-6 rounded-[30px] relative overflow-hidden mb-2">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue/50 to-transparent"></div>
-                    <div class="flex justify-between items-end">
+                    <div class="flex justify-between items-end relative z-10">
                         <div>
                             <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Owed To Me (Normal)</p>
                             <h2 class="text-3xl font-mono font-bold text-white">₹<span id="displayNormalReceivable">0</span></h2>
@@ -364,13 +390,19 @@
                 </div>
 
                 <div class="w-full max-w-md pb-12 shrink-0">
-                    <div class="flex justify-between items-center px-2 mb-3">
-                        <h3 class="text-xs text-gray-600 font-bold uppercase tracking-widest">Transaction Log</h3>
-                        <div class="flex gap-2">
-                            <button onclick="showPersonMonthlyStats()" class="text-[9px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Month</button>
-                            <button onclick="showPersonHistory()" class="text-[9px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Hist</button>
-                            <button onclick="exportPersonCSV()" class="text-[9px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-download mr-1"></i> Exp</button>
-                            <button onclick="clearPersonHistory()" class="text-[9px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-2.5 py-1 rounded-md">Clear</button>
+                    <div class="flex flex-col gap-4 px-2 mb-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs text-gray-600 font-bold uppercase tracking-widest">Transaction Log</h3>
+                            <div class="flex gap-2">
+                                <button onclick="showPersonMonthlyStats()" class="text-[9px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Month</button>
+                                <button onclick="showPersonHistory()" class="text-[9px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Hist</button>
+                                <button onclick="exportPersonCSV()" class="text-[9px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-2.5 py-1 rounded-md"><i class="fa-solid fa-download mr-1"></i> Exp</button>
+                                <button onclick="clearPersonHistory()" class="text-[9px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-2.5 py-1 rounded-md">Clear</button>
+                            </div>
+                        </div>
+                        <div class="relative w-full">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-700 text-[10px]"></i>
+                            <input type="text" id="personTxSearch" oninput="filterPersonTransactions()" placeholder="SEARCH LOG..." class="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-neonBlue transition-all">
                         </div>
                     </div>
                     <div id="personHistoryList" class="space-y-4"></div>
@@ -447,6 +479,71 @@
                 <button onclick="closeHistory()" class="mt-6 py-4 w-full rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition">CLOSE</button>
             </div>
         </div>
+
+        <div id="manualModal" class="hidden fixed inset-0 z-[90] bg-black/95 backdrop-blur-lg flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-md p-6 rounded-[30px] border border-white/20 animate-pop-in relative flex flex-col max-h-[85vh]">
+                <h3 class="text-lg font-extrabold mb-6 uppercase tracking-widest text-center text-white">How It Works</h3>
+                <div class="overflow-y-auto flex-1 space-y-5 pr-2 custom-scrollbar">
+                    
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonBlue/20">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-user-plus text-neonBlue text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonBlue uppercase tracking-widest">Normal</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Personal debt tracker. 
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Money you record as <span class="text-neonBlue">"I GAVE"</span> here is automatically deducted from your <span class="text-white">Personal Budget</span> in the Expenses tab. Use this for lending money to friends.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonYellow/20">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-clipboard-list text-neonYellow text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonYellow uppercase tracking-widest">General</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Isolated record keeping.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Transactions here do <span class="text-red-400">NOT</span> affect your Personal Budget. Use this for business records or tracking money that doesn't come out of your daily pocket.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonPurple/20">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-percent text-neonPurple text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonPurple uppercase tracking-widest">Interest</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Investment tracker.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Automatically calculates repayment amount based on:
+                            <ul class="list-disc ml-4 mt-1 text-gray-400">
+                                <li>Principal Amount</li>
+                                <li>Rate %</li>
+                                <li>Duration & Frequency</li>
+                                <li>Type (Simple vs Compound)</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonGreen/20">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-users-viewfinder text-neonGreen text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonGreen uppercase tracking-widest">Group</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Split-wise logic.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> You select members from your existing "Normal" list. Any transaction added to the Group is <span class="text-neonGreen">divided equally</span> and added to each member's individual ledger.
+                        </p>
+                    </div>
+
+                </div>
+                <button onclick="closeManual()" class="mt-6 py-4 w-full rounded-xl bg-white text-black font-bold text-xs shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-[1.02] transition">GOT IT</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -461,6 +558,31 @@
         let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
 
         window.onload = function() { initSystem(); initSwipeListeners(); };
+
+        // --- Custom Confirmation Logic ---
+        function customConfirm(title, message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const titleEl = document.getElementById('confirm-title');
+                const messageEl = document.getElementById('confirm-message');
+                const yesBtn = document.getElementById('confirm-yes');
+                const noBtn = document.getElementById('confirm-cancel');
+
+                titleEl.innerText = title;
+                messageEl.innerText = message;
+                modal.classList.remove('hidden');
+
+                const cleanup = (val) => {
+                    modal.classList.add('hidden');
+                    yesBtn.onclick = null;
+                    noBtn.onclick = null;
+                    resolve(val);
+                };
+
+                yesBtn.onclick = () => cleanup(true);
+                noBtn.onclick = () => cleanup(false);
+            });
+        }
 
         function initSystem() {
             const registry = localStorage.getItem('neonFlux_registry');
@@ -481,6 +603,7 @@
             if(!document.getElementById('txInputModal').classList.contains('hidden')) return;
             if(!document.getElementById('addPersonContainer').classList.contains('hidden')) return;
             if(!document.getElementById('historyModal').classList.contains('hidden')) return;
+            if(!document.getElementById('manualModal').classList.contains('hidden')) return; 
 
             const xDiff = touchStartX - touchEndX;
             const yDiff = touchStartY - touchEndY;
@@ -549,6 +672,14 @@
             if(tab === 'expenses') renderExpenses();
         }
 
+        function openManual() {
+            document.getElementById('manualModal').classList.remove('hidden');
+        }
+
+        function closeManual() {
+            document.getElementById('manualModal').classList.add('hidden');
+        }
+
         function setBudget() {
             const val = parseFloat(document.getElementById('budgetInput').value);
             if(!isNaN(val) && val >= 0) { expensesData.budget = val; saveAll(); renderExpenses(); }
@@ -581,29 +712,46 @@
             saveAll(); renderExpenses();
         }
 
+        function filterExpenses() {
+            renderExpenses();
+        }
+
         function renderExpenses() {
+            const query = document.getElementById('expenseSearch').value.toLowerCase();
             const currentMonth = new Date().toLocaleDateString('en-IN', {month:'short'});
-            const currentItems = expensesData.list.filter(item => item.date.includes(currentMonth));
             
-            const total = currentItems.reduce((sum, item) => sum + item.amount, 0);
-            const remaining = expensesData.budget - total;
-            const percent = expensesData.budget > 0 ? (total / expensesData.budget) * 100 : 0;
+            let filtered = expensesData.list;
+            if (query) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(query) || 
+                    item.date.toLowerCase().includes(query)
+                );
+            } else {
+                filtered = filtered.filter(item => item.date.includes(currentMonth));
+            }
+            
+            const liveMonthItems = expensesData.list.filter(item => item.date.includes(currentMonth));
+            const liveMonthSpent = liveMonthItems.reduce((sum, item) => sum + item.amount, 0);
+            
+            const remaining = expensesData.budget - liveMonthSpent;
+            const percent = expensesData.budget > 0 ? (liveMonthSpent / expensesData.budget) * 100 : 0;
             const ring = document.getElementById('ring-progress');
+            
             ring.style.strokeDasharray = `${Math.max(0, 100 - percent)}, 100`;
             ring.style.stroke = remaining < 0 ? '#ff3333' : '#00f3ff';
             document.getElementById('displayBalance').innerText = formatMoney(remaining);
-            document.getElementById('displaySpent').innerText = formatMoney(total);
+            document.getElementById('displaySpent').innerText = formatMoney(liveMonthSpent);
             document.getElementById('budgetInput').value = expensesData.budget;
             
             const listEl = document.getElementById('expenseList');
             listEl.innerHTML = '';
             
-            if(currentItems.length === 0) {
+            if(filtered.length === 0) {
                 document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('emptyState').querySelector('p').innerText = "No Recent Data";
+                document.getElementById('emptyState').querySelector('p').innerText = query ? "No Match Found" : "No Recent Data";
             } else {
                 document.getElementById('emptyState').classList.add('hidden');
-                currentItems.forEach(item => {
+                filtered.forEach(item => {
                     listEl.innerHTML += `
                         <div class="flex items-center justify-between px-6 py-5 hover:bg-white/[0.03] transition animate-slide-up border-b border-white/5 last:border-0">
                             <div class="flex items-center gap-5">
@@ -636,12 +784,7 @@
             const currentSpent = currentItems.reduce((sum, item) => sum + item.amount, 0);
             const currentLimit = expensesData.budget;
             
-            const liveData = {
-                month: currentMonth,
-                limit: currentLimit,
-                spent: currentSpent,
-                balance: currentLimit - currentSpent
-            };
+            const liveData = { month: currentMonth, limit: currentLimit, spent: currentSpent, balance: currentLimit - currentSpent };
 
             let allData = [];
             if(expensesData.historyStats) {
@@ -651,7 +794,6 @@
                 });
             }
             if(!allData.find(d => d.month === currentMonth)) allData.push(liveData);
-            
             allData.sort((a,b) => months.indexOf(b.month) - months.indexOf(a.month));
 
             allData.forEach(d => {
@@ -663,24 +805,15 @@
                         <span class="text-sm font-mono text-gray-400">Limit: ₹${formatMoney(d.limit)}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase">Spent</p>
-                            <p class="text-neonRed font-mono font-bold">₹${formatMoney(d.spent)}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] text-gray-500 uppercase">Balance</p>
-                            <p class="text-neonGreen font-mono font-bold">₹${formatMoney(d.balance)}</p>
-                        </div>
+                        <div><p class="text-[10px] text-gray-500 uppercase">Spent</p><p class="text-neonRed font-mono font-bold">₹${formatMoney(d.spent)}</p></div>
+                        <div class="text-right"><p class="text-[10px] text-gray-500 uppercase">Balance</p><p class="text-neonGreen font-mono font-bold">₹${formatMoney(d.balance)}</p></div>
                     </div>
                 </div>`;
             });
             document.getElementById('monthlyStatsModal').classList.remove('hidden');
         }
 
-        function showHistory() {
-            renderHistoryView(expensesData.list, 'Expense History', 'expense');
-        }
-
+        function showHistory() { renderHistoryView(expensesData.list, 'Expense History', 'expense'); }
         function showPersonHistory() {
             const p = peopleData.find(x => x.id === activePersonId);
             if (!p || p.isGroup) return alert("History available for individual ledgers only.");
@@ -691,7 +824,6 @@
             document.getElementById('historyModalTitle').innerText = title;
             const grouped = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            
             dataList.forEach(item => {
                 const parts = item.date.split(' ');
                 let month = '';
@@ -699,7 +831,6 @@
                     const possibleMonth = parts[1].replace(',', '');
                     if (months.includes(possibleMonth)) month = possibleMonth;
                 }
-                
                 if(month) {
                     if(!grouped[month]) grouped[month] = [];
                     grouped[month].push(item);
@@ -714,10 +845,7 @@
                 container.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No History Available</p>';
             } else {
                 sortedMonths.forEach(m => {
-                    let monthTotal = 0;
-                    let txHtml = '';
-                    
-                    let dailyGroups = {};
+                    let monthTotal = 0; let txHtml = ''; let dailyGroups = {};
                     grouped[m].forEach(t => {
                         monthTotal += t.amount;
                         let dateKey = t.date.split(',')[0].trim();
@@ -725,62 +853,18 @@
                         dailyGroups[dateKey].total += t.amount;
                         dailyGroups[dateKey].list.push(t);
                     });
-
                     const sortedDays = Object.keys(dailyGroups).sort((a, b) => parseInt(b) - parseInt(a));
-
                     sortedDays.forEach(day => {
-                        txHtml += `
-                            <div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5">
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span>
-                                <span class="text-[10px] font-mono font-bold text-neonBlue">₹${formatMoney(dailyGroups[day].total)}</span>
-                            </div>
-                        `;
-
+                        txHtml += `<div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span><span class="text-[10px] font-mono font-bold text-neonBlue">₹${formatMoney(dailyGroups[day].total)}</span></div>`;
                         dailyGroups[day].list.forEach(t => {
                             if(mode === 'expense') {
-                                txHtml += `
-                                <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div>
-                                        <div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div>
-                                    </div>
-                                    <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
-                                </div>`;
+                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div><div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div></div><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span></div>`;
                             } else {
-                                txHtml += `
-                                <div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4">
-                                    <div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div>
-                                    <span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span>
-                                </div>`;
+                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span></div>`;
                             }
                         });
                     });
-
-                    let summaryBadge = '';
-                    if (mode === 'expense' && expensesData.historyStats && expensesData.historyStats[m]) {
-                        const h = expensesData.historyStats[m];
-                        summaryBadge = `<div class="mt-1 text-[10px] text-gray-400">Limit: ₹${formatMoney(h.limit)} | Spent: ₹${formatMoney(h.spent)}</div>`;
-                    }
-
-                    container.innerHTML += `
-                    <div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden">
-                        <button onclick="toggleHistoryMonth('${m}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition">
-                            <div class="text-left">
-                                <span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span>
-                                ${summaryBadge}
-                            </div>
-                            <div class="flex items-center gap-3 text-right">
-                                <div>
-                                    <span class="block text-neonGreen font-mono font-bold text-sm">₹${formatMoney(monthTotal)}</span>
-                                    <span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${m}"></i>
-                            </div>
-                        </button>
-                        <div id="hist-${m}" class="hidden p-2 bg-black/20">
-                            ${txHtml}
-                        </div>
-                    </div>`;
+                    container.innerHTML += `<div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden"><button onclick="toggleHistoryMonth('${m}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition"><div class="text-left"><span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span></div><div class="flex items-center gap-3 text-right"><div><span class="block text-neonGreen font-mono font-bold text-sm">₹${formatMoney(monthTotal)}</span><span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span></div><i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${m}"></i></div></button><div id="hist-${m}" class="hidden p-2 bg-black/20">${txHtml}</div></div>`;
                 });
             }
             document.getElementById('historyModal').classList.remove('hidden');
@@ -797,30 +881,16 @@
 
         function showMonthlyStats() {
             document.getElementById('statsModalTitle').innerText = "Monthly Breakdown";
-            const stats = {};
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const stats = {}; const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             expensesData.list.forEach(item => {
-                const parts = item.date.split(' ');
-                let month = '';
-                if(parts.length > 1) {
-                    const possibleMonth = parts[1].replace(',', '');
-                    if (months.includes(possibleMonth)) month = possibleMonth;
-                }
-                
-                if(month) {
-                    if(!stats[month]) stats[month] = 0;
-                    stats[month] += item.amount;
-                }
+                const parts = item.date.split(' '); let month = '';
+                if(parts.length > 1) { const possibleMonth = parts[1].replace(',', ''); if (months.includes(possibleMonth)) month = possibleMonth; }
+                if(month) { if(!stats[month]) stats[month] = 0; stats[month] += item.amount; }
             });
-            const listEl = document.getElementById('monthlyStatsList');
-            listEl.innerHTML = '';
+            const listEl = document.getElementById('monthlyStatsList'); listEl.innerHTML = '';
             const sortedMonths = Object.keys(stats).sort((a,b) => months.indexOf(a) - months.indexOf(b));
             if(sortedMonths.length === 0) listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Data Recorded</p>';
-            else {
-                sortedMonths.forEach(m => {
-                    listEl.innerHTML += `<div class="flex justify-between items-center bg-white/5 p-5 rounded-xl border border-white/5"><span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span><span class="text-neonPurple font-mono font-bold text-lg">₹${formatMoney(stats[m])}</span></div>`;
-                });
-            }
+            else sortedMonths.forEach(m => { listEl.innerHTML += `<div class="flex justify-between items-center bg-white/5 p-5 rounded-xl border border-white/5"><span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span><span class="text-neonPurple font-mono font-bold text-lg">₹${formatMoney(stats[m])}</span></div>`; });
             document.getElementById('monthlyStatsModal').classList.remove('hidden');
         }
 
@@ -831,15 +901,12 @@
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `${currentUser.name}_expenses.csv`);
-            a.click();
+            a.setAttribute('href', url); a.setAttribute('download', `${currentUser.name}_expenses.csv`); a.click();
         }
 
         function renderPeopleGrid() {
             updateNormalReceivableDisplay();
-            const grid = document.getElementById('peopleGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('peopleGrid'); grid.innerHTML = '';
             if(peopleData.length === 0) document.getElementById('peopleEmptyState').classList.remove('hidden');
             else {
                 document.getElementById('peopleEmptyState').classList.add('hidden');
@@ -848,23 +915,14 @@
                     if(p.isGroup) {
                           p.members.forEach(mId => {
                              const m = peopleData.find(x => x.id === mId);
-                             if(m) {
-                                 m.transactions.forEach(t => {
-                                     if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) {
-                                         bal += (t.type==='GAVE'?t.amount:-t.amount);
-                                     }
-                                 });
-                             }
+                             if(m) m.transactions.forEach(t => { if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) bal += (t.type==='GAVE'?t.amount:-t.amount); });
                           });
-                    } else {
-                        p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
-                    }
+                    } else p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
                     let badge = '';
                     if(p.isGroup) badge = `<span class="absolute top-4 right-4 text-[9px] text-neonGreen border border-neonGreen/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">Group</span>`;
                     else if(p.isGeneral) badge = `<span class="absolute top-4 right-4 text-[9px] text-neonYellow border border-neonYellow/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">General</span>`;
                     else if(p.interestMode && p.interestMode !== 'none') badge = `<span class="absolute top-4 right-4 text-[9px] text-neonPurple border border-neonPurple/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">${p.interestMode}</span>`;
                     else if(p.id === 'myself') badge = `<span class="absolute top-4 right-4 text-[9px] text-white border border-white/30 px-2 py-0.5 rounded-full uppercase tracking-wider bg-black/50">Me</span>`;
-                    
                     grid.innerHTML += `<div onclick="openPersonDetails(${p.id === 'myself' ? "'myself'" : p.id})" class="glass-panel p-6 rounded-[24px] border ${bal >= 0 ? 'border-neonBlue/20' : 'border-red-500/20'} cursor-pointer hover:scale-[1.02] transition-transform relative">${badge}<h3 class="text-xl font-bold">${p.name}</h3><p class="text-3xl font-mono ${bal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(bal))}</p></div>`;
                 });
             }
@@ -874,8 +932,7 @@
             let totalOthersOweMe = 0;
             peopleData.forEach(p => {
                 if (!p.isGroup && (!p.interestMode || p.interestMode === 'none') && p.id !== 'myself' && !p.isGeneral) {
-                    let bal = 0;
-                    p.transactions.forEach(t => bal += (t.type === 'GAVE' ? t.amount : -t.amount));
+                    let bal = 0; p.transactions.forEach(t => bal += (t.type === 'GAVE' ? t.amount : -t.amount));
                     if (bal > 0) totalOthersOweMe += bal;
                 }
             });
@@ -883,122 +940,83 @@
         }
 
         function openAddPersonMode(mode) {
-            currentAddMode = mode;
-            document.getElementById('addPersonContainer').classList.remove('hidden');
-            document.getElementById('newPersonName').value = '';
-            document.getElementById('interestOptions').classList.add('hidden');
-            document.getElementById('groupOptions').classList.add('hidden');
-            document.getElementById('addPersonTitle').innerText = 'Adding Normal';
-            
-            if(mode === 'general') {
-                 document.getElementById('addPersonTitle').innerText = 'Adding General Record';
-            } else if(mode === 'interest') {
+            currentAddMode = mode; document.getElementById('addPersonContainer').classList.remove('hidden');
+            document.getElementById('newPersonName').value = ''; document.getElementById('interestOptions').classList.add('hidden');
+            document.getElementById('groupOptions').classList.add('hidden'); document.getElementById('addPersonTitle').innerText = 'Adding Normal';
+            if(mode === 'general') document.getElementById('addPersonTitle').innerText = 'Adding General Record';
+            else if(mode === 'interest') {
                  document.getElementById('addPersonTitle').innerText = 'Adding w/ Interest';
-                 document.getElementById('interestOptions').classList.remove('hidden');
-                 document.getElementById('interestRate').value = '';
-                 document.getElementById('interestTime').value = '';
+                 document.getElementById('interestOptions').classList.remove('hidden'); document.getElementById('interestRate').value = ''; document.getElementById('interestTime').value = '';
             } else if (mode === 'group') {
-                 document.getElementById('addPersonTitle').innerText = 'Creating Group';
-                 document.getElementById('groupOptions').classList.remove('hidden');
-                 populateGroupMemberList();
+                 document.getElementById('addPersonTitle').innerText = 'Creating Group'; document.getElementById('groupOptions').classList.remove('hidden'); populateGroupMemberList();
             }
         }
 
         function populateGroupMemberList() {
-            const list = document.getElementById('groupMemberList');
-            list.innerHTML = '';
+            const list = document.getElementById('groupMemberList'); list.innerHTML = '';
             const eligible = peopleData.filter(p => !p.isGroup && (!p.interestMode || p.interestMode === 'none') && !p.isGeneral);
-            if(eligible.length === 0) {
-                list.innerHTML = '<p class="text-center text-xs text-gray-500">No normal members found.</p>';
-            } else {
-                eligible.forEach(p => {
-                    list.innerHTML += `<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer"><input type="checkbox" class="group-member-cb accent-neonGreen w-4 h-4" value="${p.id}"><span class="text-sm text-gray-300 font-bold">${p.name}</span></label>`;
-                });
-            }
+            if(eligible.length === 0) list.innerHTML = '<p class="text-center text-xs text-gray-500">No normal members found.</p>';
+            else eligible.forEach(p => { list.innerHTML += `<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer"><input type="checkbox" class="group-member-cb accent-neonGreen w-4 h-4" value="${p.id}"><span class="text-sm text-gray-300 font-bold">${p.name}</span></label>`; });
         }
 
-        function cancelAddPerson() {
-            document.getElementById('addPersonContainer').classList.add('hidden');
-            currentAddMode = null;
-        }
+        function cancelAddPerson() { document.getElementById('addPersonContainer').classList.add('hidden'); currentAddMode = null; }
 
         function confirmAddPerson() {
-            const name = document.getElementById('newPersonName').value.trim();
-            if(!name) return;
+            const name = document.getElementById('newPersonName').value.trim(); if(!name) return;
             let personObj = { id: Date.now(), name, transactions: [], interestMode: 'none', interestRate: 0, timeValue: 0, timeUnit: 'years', interestFreq: 'yearly', isGroup: false, members: [], isGeneral: false };
-            
-            if(currentAddMode === 'general') {
-                personObj.isGeneral = true;
-            } else if(currentAddMode === 'interest') {
-                const type = document.getElementById('interestType').value;
-                const rate = parseFloat(document.getElementById('interestRate').value);
-                const timeVal = parseFloat(document.getElementById('interestTime').value);
-                const timeUnit = document.getElementById('interestTimeUnit').value;
-                const freq = document.getElementById('interestFreq').value;
-                if(isNaN(rate) || rate < 0 || isNaN(timeVal) || timeVal < 0) return alert("Valid rate and duration required");
+            if(currentAddMode === 'general') personObj.isGeneral = true;
+            else if(currentAddMode === 'interest') {
+                const type = document.getElementById('interestType').value; const rate = parseFloat(document.getElementById('interestRate').value);
+                const timeVal = parseFloat(document.getElementById('interestTime').value); const timeUnit = document.getElementById('interestTimeUnit').value;
+                const freq = document.getElementById('interestFreq').value; if(isNaN(rate) || rate < 0 || isNaN(timeVal) || timeVal < 0) return alert("Valid rate and duration required");
                 personObj.interestMode = type; personObj.interestRate = rate; personObj.timeValue = timeVal; personObj.timeUnit = timeUnit; personObj.interestFreq = freq;
             } else if (currentAddMode === 'group') {
-                const checkboxes = document.querySelectorAll('.group-member-cb:checked');
-                if(checkboxes.length < 2) return alert("Select at least 2 members");
-                personObj.isGroup = true;
-                checkboxes.forEach(cb => personObj.members.push(cb.value === 'myself' ? 'myself' : parseInt(cb.value)));
+                const checkboxes = document.querySelectorAll('.group-member-cb:checked'); if(checkboxes.length < 2) return alert("Select at least 2 members");
+                personObj.isGroup = true; checkboxes.forEach(cb => personObj.members.push(cb.value === 'myself' ? 'myself' : parseInt(cb.value)));
             }
-            peopleData.push(personObj);
-            saveAll(); renderPeopleGrid(); cancelAddPerson();
+            peopleData.push(personObj); saveAll(); renderPeopleGrid(); cancelAddPerson();
         }
 
         function openEditInterestModal() {
-            const p = peopleData.find(x => x.id === activePersonId);
-            if(!p) return;
-            document.getElementById('editInterestType').value = p.interestMode;
-            document.getElementById('editInterestRate').value = p.interestRate;
-            document.getElementById('editInterestTime').value = p.timeValue;
-            document.getElementById('editInterestTimeUnit').value = p.timeUnit;
-            document.getElementById('editInterestFreq').value = p.interestFreq;
-            document.getElementById('editInterestModal').classList.remove('hidden');
+            const p = peopleData.find(x => x.id === activePersonId); if(!p) return;
+            document.getElementById('editInterestType').value = p.interestMode; document.getElementById('editInterestRate').value = p.interestRate;
+            document.getElementById('editInterestTime').value = p.timeValue; document.getElementById('editInterestTimeUnit').value = p.timeUnit;
+            document.getElementById('editInterestFreq').value = p.interestFreq; document.getElementById('editInterestModal').classList.remove('hidden');
         }
 
         function closeEditInterestModal() { document.getElementById('editInterestModal').classList.add('hidden'); }
-
         function updateInterestDetails() {
-            const p = peopleData.find(x => x.id === activePersonId);
-            if(!p) return;
-            const rate = parseFloat(document.getElementById('editInterestRate').value);
-            const timeVal = parseFloat(document.getElementById('editInterestTime').value);
+            const p = peopleData.find(x => x.id === activePersonId); if(!p) return;
+            const rate = parseFloat(document.getElementById('editInterestRate').value); const timeVal = parseFloat(document.getElementById('editInterestTime').value);
             if(isNaN(rate) || rate < 0 || isNaN(timeVal) || timeVal < 0) return alert("Invalid inputs");
-            p.interestMode = document.getElementById('editInterestType').value;
-            p.interestRate = rate; p.timeValue = timeVal; p.timeUnit = document.getElementById('editInterestTimeUnit').value; p.interestFreq = document.getElementById('editInterestFreq').value;
+            p.interestMode = document.getElementById('editInterestType').value; p.interestRate = rate; p.timeValue = timeVal; 
+            p.timeUnit = document.getElementById('editInterestTimeUnit').value; p.interestFreq = document.getElementById('editInterestFreq').value;
             saveAll(); closeEditInterestModal(); renderPersonDetailsInternal(p);
         }
 
         function openPersonDetails(id) {
             activePersonId = id; const p = peopleData.find(x => x.id === id);
             document.getElementById('detailPersonName').innerText = p.name;
-            renderPersonDetailsInternal(p);
+            document.getElementById('personTxSearch').value = ''; renderPersonDetailsInternal(p);
             document.getElementById('personDetailOverlay').classList.replace('closed','open');
         }
 
+        function filterPersonTransactions() {
+            const p = peopleData.find(x => x.id === activePersonId); if(p) renderPersonDetailsInternal(p);
+        }
+
         function renderPersonDetailsInternal(p) {
-            let principal = 0; 
-            const detailCard = document.getElementById('detailedInterestCard');
-            const groupCard = document.getElementById('detailedGroupMembers');
+            const searchQuery = document.getElementById('personTxSearch').value.toLowerCase();
+            let principal = 0; const detailCard = document.getElementById('detailedInterestCard'); const groupCard = document.getElementById('detailedGroupMembers');
             detailCard.classList.add('hidden'); groupCard.classList.add('hidden');
-            const list = document.getElementById('personHistoryList'); 
-            list.innerHTML = '';
+            const list = document.getElementById('personHistoryList'); list.innerHTML = '';
 
             if(p.isGroup) {
-                 groupCard.classList.remove('hidden');
-                 const membersDiv = document.getElementById('groupMembersDisplay');
-                 membersDiv.innerHTML = '';
+                 groupCard.classList.remove('hidden'); const membersDiv = document.getElementById('groupMembersDisplay'); membersDiv.innerHTML = '';
                  p.members.forEach(mId => {
                      const m = peopleData.find(x => x.id === mId);
                      if(m) {
-                         let mBal = 0;
-                         m.transactions.forEach(t => {
-                             if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) {
-                                 mBal += (t.type==='GAVE'?t.amount:-t.amount);
-                             }
-                         });
+                         let mBal = 0; m.transactions.forEach(t => { if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) mBal += (t.type==='GAVE'?t.amount:-t.amount); });
                          membersDiv.innerHTML += `<div class="flex justify-between items-center bg-white/5 p-2 px-3 rounded-lg border border-white/5"><span class="text-xs text-gray-300 font-bold">${m.name}</span><span class="text-xs font-mono font-bold ${mBal >= 0 ? 'text-neonBlue' : 'text-red-500'}">₹${formatMoney(Math.abs(mBal))}</span></div>`;
                          principal += mBal; 
                      }
@@ -1013,31 +1031,10 @@
             let finalAmount = principal;
 
             if(p.interestMode && p.interestMode !== 'none' && Math.abs(principal) > 0) {
-                // Determine months per cycle based on frequency
-                let monthsPerCycle = 1; // monthly
-                if (p.interestFreq === 'quarterly') monthsPerCycle = 3;
-                else if (p.interestFreq === 'half-yearly') monthsPerCycle = 6;
-                else if (p.interestFreq === 'yearly') monthsPerCycle = 12;
-
-                // Total duration in months
-                let durationInMonths = p.timeUnit === 'years' ? p.timeValue * 12 : p.timeValue;
-                
-                // Total compounding/calculation cycles
-                let totalCycles = durationInMonths / monthsPerCycle;
-                
-                // Rate is treated as periodic rate as per user requirement
-                let r = p.interestRate / 100;
-                let debt = Math.abs(principal);
-                let interestAmount = 0;
-
-                if (p.interestMode === 'simple') {
-                    // Simple Interest: P * R * T (where T is number of cycles)
-                    interestAmount = debt * r * totalCycles;
-                } else {
-                    // Compound Interest: P * (1 + R)^T - P
-                    interestAmount = (debt * Math.pow((1 + r), totalCycles)) - debt;
-                }
-
+                let monthsPerCycle = 1; if (p.interestFreq === 'quarterly') monthsPerCycle = 3; else if (p.interestFreq === 'half-yearly') monthsPerCycle = 6; else if (p.interestFreq === 'yearly') monthsPerCycle = 12;
+                let durationInMonths = p.timeUnit === 'years' ? p.timeValue * 12 : p.timeValue; let totalCycles = durationInMonths / monthsPerCycle;
+                let r = p.interestRate / 100; let debt = Math.abs(principal); let interestAmount = 0;
+                if (p.interestMode === 'simple') interestAmount = debt * r * totalCycles; else interestAmount = (debt * Math.pow((1 + r), totalCycles)) - debt;
                 finalAmount = principal > 0 ? principal + interestAmount : principal - interestAmount;
                 detailCard.innerHTML = `<button onclick="openEditInterestModal()" class="absolute top-3 right-3 w-8 h-8 bg-white/5 rounded-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-pen text-xs"></i></button><div class="grid grid-cols-2 gap-y-3 text-[10px] uppercase tracking-widest"><div class="text-gray-500">Principal</div><div class="text-right font-bold text-white text-xs">₹${formatMoney(debt)}</div><div class="text-gray-500">Rate</div><div class="text-right font-bold text-white">${p.interestRate}% / ${p.interestFreq}</div><div class="text-gray-500">Interest</div><div class="text-right font-bold text-neonPurple text-sm">₹${formatMoney(interestAmount)}</div></div>`;
                 detailCard.classList.remove('hidden');
@@ -1045,89 +1042,44 @@
 
             document.getElementById('detailBalance').innerText = `₹${formatMoney(Math.abs(finalAmount))}`;
             document.getElementById('detailStatus').innerText = finalAmount > 0 ? 'OWES YOU' : (finalAmount < 0 ? 'YOU OWE' : 'SETTLED');
-            
             const currentMonth = new Date().toLocaleDateString('en-IN', {month:'short'});
-            const currentItems = p.transactions.filter(t => t.date.includes(currentMonth));
+            let filteredTx = p.transactions;
+            if (searchQuery) filteredTx = filteredTx.filter(t => (t.desc && t.desc.toLowerCase().includes(searchQuery)) || t.date.toLowerCase().includes(searchQuery) || t.type.toLowerCase().includes(searchQuery));
+            else filteredTx = filteredTx.filter(t => t.date.includes(currentMonth));
 
-            currentItems.sort((a,b) => b.id - a.id).forEach(t => {
+            filteredTx.sort((a,b) => b.id - a.id).forEach(t => {
                 const isGave = t.type === 'GAVE';
                 list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 w-auto min-w-[65px]"><p class="text-xs font-black text-white uppercase leading-tight">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div>`;
             });
-            if(currentItems.length === 0) {
-                 list.innerHTML = '<p class="text-center text-xs text-gray-500 py-6 uppercase tracking-widest">No Recent Transactions</p>';
-            }
+            if(filteredTx.length === 0) list.innerHTML = `<p class="text-center text-xs text-gray-500 py-6 uppercase tracking-widest">${searchQuery ? 'No Match Found' : 'No Recent Transactions'}</p>`;
         }
 
         function showPersonMonthlyStats() {
-            const p = peopleData.find(x => x.id === activePersonId);
-            if (!p || p.isGroup) return alert("Monthly stats available for individual ledgers only.");
-            
-            const stats = {};
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            
+            const p = peopleData.find(x => x.id === activePersonId); if (!p || p.isGroup) return alert("Monthly stats available for individual ledgers only.");
+            const stats = {}; const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             p.transactions.forEach(t => {
-                const parts = t.date.split(' ');
-                let month = '';
-                if(parts.length > 1) {
-                    const possibleMonth = parts[1].replace(',', '');
-                    if (months.includes(possibleMonth)) month = possibleMonth;
-                }
-
-                if(month) {
-                    if(!stats[month]) stats[month] = { gave: 0, got: 0 };
-                    if(t.type === 'GAVE') stats[month].gave += t.amount;
-                    else stats[month].got += t.amount;
-                }
+                const parts = t.date.split(' '); let month = '';
+                if(parts.length > 1) { const possibleMonth = parts[1].replace(',', ''); if (months.includes(possibleMonth)) month = possibleMonth; }
+                if(month) { if(!stats[month]) stats[month] = { gave: 0, got: 0 }; if(t.type === 'GAVE') stats[month].gave += t.amount; else stats[month].got += t.amount; }
             });
-
-            const listEl = document.getElementById('monthlyStatsList');
-            listEl.innerHTML = '';
+            const listEl = document.getElementById('monthlyStatsList'); listEl.innerHTML = '';
             const sortedMonths = Object.keys(stats).sort((a,b) => months.indexOf(a) - months.indexOf(b));
-            
-            if(sortedMonths.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Transactions Found</p>';
-            } else {
-                sortedMonths.forEach(m => {
-                    listEl.innerHTML += `
-                    <div class="bg-white/5 p-4 rounded-xl border border-white/5 mb-2">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span class="text-neonBlue">Gave: ₹${formatMoney(stats[m].gave)}</span>
-                            <span class="text-red-500">Got: ₹${formatMoney(stats[m].got)}</span>
-                        </div>
-                    </div>`;
-                });
-            }
+            if(sortedMonths.length === 0) listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No Transactions Found</p>';
+            else sortedMonths.forEach(m => { listEl.innerHTML += `<div class="bg-white/5 p-4 rounded-xl border border-white/5 mb-2"><div class="flex justify-between items-center mb-2"><span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span></div><div class="flex justify-between text-xs"><span class="text-neonBlue">Gave: ₹${formatMoney(stats[m].gave)}</span><span class="text-red-500">Got: ₹${formatMoney(stats[m].got)}</span></div></div>`; });
             document.getElementById('monthlyStatsModal').classList.remove('hidden');
         }
 
         function exportPersonCSV() {
-            const p = peopleData.find(x => x.id === activePersonId);
-            if (!p) return;
-            if (p.isGroup) return alert("Export not available for groups yet.");
-
-            let csv = "Date,Type,Description,Amount\n";
-            p.transactions.forEach(t => csv += `${t.date},${t.type},"${t.desc || ''}",${t.amount}\n`);
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `${p.name}_ledger.csv`);
-            a.click();
+            const p = peopleData.find(x => x.id === activePersonId); if (!p) return; if (p.isGroup) return alert("Export not available for groups yet.");
+            let csv = "Date,Type,Description,Amount\n"; p.transactions.forEach(t => csv += `${t.date},${t.type},"${t.desc || ''}",${t.amount}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', `${p.name}_ledger.csv`); a.click();
         }
 
-        function clearPersonHistory() {
-            const p = peopleData.find(x => x.id === activePersonId);
-            if (!p) return;
-            if (p.isGroup) return alert("Cannot clear group history directly.");
-            
-            if(confirm(`Are you sure you want to delete ALL transactions with ${p.name}? This cannot be undone.`)) {
-                p.transactions = [];
-                saveAll();
-                renderPersonDetailsInternal(p);
+        async function clearPersonHistory() {
+            const p = peopleData.find(x => x.id === activePersonId); if (!p) return; if (p.isGroup) return alert("Cannot clear group history directly.");
+            if(await customConfirm("Clear History", `Delete all transactions with ${p.name}?`)) {
+                p.transactions = []; saveAll(); renderPersonDetailsInternal(p);
             }
         }
 
@@ -1139,102 +1091,61 @@
 
         function loadData() {
             if(!currentUser) return;
-            expensesData = { budget: 0, list: [], lastActiveMonth: '', historyStats: {} }; 
-            peopleData = [];
-            
-            const e = localStorage.getItem('neonFlux_expenses_' + currentUser.id); 
-            if(e) {
-                const parsed = JSON.parse(e);
-                expensesData = { ...expensesData, ...parsed }; 
-            }
-            
-            const p = localStorage.getItem('neonFlux_people_' + currentUser.id); 
-            if(p) peopleData = JSON.parse(p);
-            
-            if (!peopleData.some(x => x.id === 'myself')) {
-                peopleData.push({ id: 'myself', name: 'Myself', transactions: [], interestMode: 'none', isGroup: false });
-                saveAll();
-            }
-
+            expensesData = { budget: 0, list: [], lastActiveMonth: '', historyStats: {} }; peopleData = [];
+            const e = localStorage.getItem('neonFlux_expenses_' + currentUser.id); if(e) expensesData = { ...expensesData, ...JSON.parse(e) };
+            const p = localStorage.getItem('neonFlux_people_' + currentUser.id); if(p) peopleData = JSON.parse(p);
+            if (!peopleData.some(x => x.id === 'myself')) { peopleData.push({ id: 'myself', name: 'Myself', transactions: [], interestMode: 'none', isGroup: false }); saveAll(); }
             const currentMonthName = new Date().toLocaleDateString('en-IN', {month:'short'});
             if (expensesData.lastActiveMonth && expensesData.lastActiveMonth !== currentMonthName) {
-                const prevMonth = expensesData.lastActiveMonth;
-                const prevItems = expensesData.list.filter(item => item.date.includes(prevMonth));
-                const prevSpent = prevItems.reduce((sum, i) => sum + i.amount, 0);
-                
+                const prevMonth = expensesData.lastActiveMonth; const prevSpent = expensesData.list.filter(item => item.date.includes(prevMonth)).reduce((sum, i) => sum + i.amount, 0);
                 if (!expensesData.historyStats) expensesData.historyStats = {};
-                expensesData.historyStats[prevMonth] = {
-                    limit: expensesData.budget,
-                    spent: prevSpent
-                };
-
+                expensesData.historyStats[prevMonth] = { limit: expensesData.budget, spent: prevSpent };
                 expensesData.budget = 0;
             }
-            
-            expensesData.lastActiveMonth = currentMonthName;
-            saveAll();
+            expensesData.lastActiveMonth = currentMonthName; saveAll();
         }
 
         function formatMoney(amount) { return new Intl.NumberFormat('en-IN').format(Math.round(amount)); }
-        function logout() { currentUser = null; document.getElementById('app-view').classList.add('view-hidden'); document.getElementById('login-view').style.display = 'flex'; renderAuthScreen(); }
-        function resetSystem() { if(confirm("DANGER: This will delete ALL users and data. Continue?")) { localStorage.clear(); window.location.reload(); } }
+        
+        async function logout() { 
+            if(await customConfirm("Logout", "Are you sure you want to exit?")) {
+                currentUser = null; document.getElementById('app-view').classList.add('view-hidden'); 
+                document.getElementById('login-view').style.display = 'flex'; renderAuthScreen(); 
+            }
+        }
+
+        async function resetSystem() { if(await customConfirm("Total Reset", "DANGER: Delete ALL users and data?")) { localStorage.clear(); window.location.reload(); } }
         function closePersonDetails() { document.getElementById('personDetailOverlay').classList.replace('open','closed'); renderPeopleGrid(); }
-        function deleteExpense(id) { if(confirm("Delete this expense?")) { expensesData.list = expensesData.list.filter(e => e.id !== id); saveAll(); renderExpenses(); } }
-        function delTx(id) { 
-            if(confirm("Delete this record?")) { 
-                const p = peopleData.find(x=>x.id===activePersonId); 
-                if(p && !p.isGroup) { p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); }
+        async function deleteExpense(id) { if(await customConfirm("Delete Expense", "Remove this expense permanently?")) { expensesData.list = expensesData.list.filter(e => e.id !== id); saveAll(); renderExpenses(); } }
+        async function delTx(id) { 
+            if(await customConfirm("Delete Record", "Delete this transaction permanently?")) { 
+                const p = peopleData.find(x=>x.id===activePersonId); if(p && !p.isGroup) { p.transactions = p.transactions.filter(t=>t.id!==id); saveAll(); renderPersonDetailsInternal(p); }
             } 
         }
-        function deleteCurrentPerson() { 
+
+        async function deleteCurrentPerson() { 
             if(activePersonId === 'myself') return alert("Cannot delete 'Myself' ledger.");
-            if(confirm("Delete this entire ledger?")) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } 
+            if(await customConfirm("Delete Ledger", "Delete this ledger and all history?")) { peopleData = peopleData.filter(x=>x.id!==activePersonId); saveAll(); closePersonDetails(); } 
         }
-        function resetExpenses() { if(confirm("Clear all expenses?")) { expensesData.list = []; saveAll(); renderExpenses(); } }
+
+        async function resetExpenses() { if(await customConfirm("Clear Log", "Wipe all expenses for this month?")) { expensesData.list = []; saveAll(); renderExpenses(); } }
         function openTransactionModal(type) { activeTxType=type; document.getElementById('txModalType').innerText = type; document.getElementById('txInputModal').classList.remove('hidden'); }
         function closeTxModal() { document.getElementById('txInputModal').classList.add('hidden'); document.getElementById('txDesc').value=''; document.getElementById('txAmt').value=''; }
         
         function submitPersonTx() {
-            const amt = parseFloat(document.getElementById('txAmt').value);
-            if(isNaN(amt)||amt<=0) return;
-            const p = peopleData.find(x=>x.id===activePersonId);
-            const desc = document.getElementById('txDesc').value;
-            
-            const now = Date.now();
-            const d = new Date();
+            const amt = parseFloat(document.getElementById('txAmt').value); if(isNaN(amt)||amt<=0) return;
+            const p = peopleData.find(x=>x.id===activePersonId); const desc = document.getElementById('txDesc').value;
+            const now = Date.now(); const d = new Date();
             const dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ', ' + d.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
-            
             if (activeTxType === 'GAVE') {
                 const isNormalPerson = !p.isGroup && (!p.interestMode || p.interestMode === 'none');
-                const isMyself = p.id === 'myself';
-                const isGroup = p.isGroup;
-                const isGeneral = p.isGeneral === true; 
-
-                if ((isNormalPerson || isMyself || isGroup) && !isGeneral) {
-                    expensesData.list.unshift({
-                        id: Date.now() + 1,
-                        name: `subtracted from ${p.name}`,
-                        amount: amt,
-                        date: dateStr,
-                        icon: 'fa-money-bill-transfer'
-                    });
-                }
+                if ((isNormalPerson || p.id === 'myself' || p.isGroup) && !p.isGeneral) expensesData.list.unshift({ id: Date.now() + 1, name: `subtracted from ${p.name}`, amount: amt, date: dateStr, icon: 'fa-money-bill-transfer' });
             }
-
             if(p.isGroup) {
                 const splitAmt = amt / p.members.length;
-                p.members.forEach(mId => {
-                    const m = peopleData.find(x => x.id === mId);
-                    if(m) m.transactions.push({ id: now + Math.random(), type: activeTxType, amount: splitAmt, desc: `(Group: ${p.name}) ${desc}`, date: dateStr });
-                });
-            } else {
-                p.transactions.push({ id: now, type: activeTxType, amount: amt, desc: desc, date: dateStr });
-            }
-            
-            saveAll(); 
-            closeTxModal(); 
-            renderPersonDetailsInternal(p);
-            if (currentTab === 'expenses') renderExpenses();
+                p.members.forEach(mId => { const m = peopleData.find(x => x.id === mId); if(m) m.transactions.push({ id: now + Math.random(), type: activeTxType, amount: splitAmt, desc: `(Group: ${p.name}) ${desc}`, date: dateStr }); });
+            } else p.transactions.push({ id: now, type: activeTxType, amount: amt, desc: desc, date: dateStr });
+            saveAll(); closeTxModal(); renderPersonDetailsInternal(p); if (currentTab === 'expenses') renderExpenses();
         }
     </script>
 </body>
