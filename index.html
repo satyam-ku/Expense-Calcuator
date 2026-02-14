@@ -226,13 +226,13 @@
 
                 <div>
                     <div class="flex flex-col gap-4 px-4 mb-3">
-                        <div class="flex justify-between items-center">
+                        <div class="flex flex-col gap-3">
                             <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Transaction Log</h3>
-                            <div class="flex gap-2">
-                                <button onclick="showMonthlyStats()" class="text-[10px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-chart-pie mr-1"></i> Monthly</button>
-                                <button onclick="showHistory()" class="text-[10px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-clock-rotate-left mr-1"></i> History</button>
-                                <button onclick="exportCSV()" class="text-[10px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-3 py-1.5 rounded-md"><i class="fa-solid fa-download mr-1"></i> Export</button>
-                                <button onclick="resetExpenses()" class="text-[10px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded-md">Clear</button>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <button onclick="showMonthlyStats()" class="text-[10px] text-neonPurple/60 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/20 px-3 py-2 rounded-md truncate"><i class="fa-solid fa-chart-pie mr-1"></i> Monthly</button>
+                                <button onclick="showHistory()" class="text-[10px] text-neonGreen/60 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/20 px-3 py-2 rounded-md truncate"><i class="fa-solid fa-clock-rotate-left mr-1"></i> History</button>
+                                <button onclick="exportCSV()" class="text-[10px] text-neonBlue/60 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/20 px-3 py-2 rounded-md truncate"><i class="fa-solid fa-download mr-1"></i> Export</button>
+                                <button onclick="resetExpenses()" class="text-[10px] text-red-500/60 hover:text-red-400 uppercase tracking-widest border border-red-500/20 px-3 py-2 rounded-md truncate">Clear</button>
                             </div>
                         </div>
                         <div class="relative w-full">
@@ -242,6 +242,9 @@
                     </div>
                     <div class="glass-panel rounded-[30px] overflow-hidden min-h-[300px]">
                         <div id="expenseList" class="divide-y divide-white/5"></div>
+                        <div id="showMoreContainer" class="hidden p-4 text-center border-t border-white/5">
+                            <button onclick="toggleShowAllExpenses()" id="btnShowMore" class="text-[10px] text-neonBlue font-bold uppercase tracking-[0.2em] hover:text-white transition-colors">Show More</button>
+                        </div>
                         <div id="emptyState" class="hidden py-20 text-center">
                             <i class="fa-solid fa-box-open text-5xl text-gray-800 mb-3"></i>
                             <p class="text-xs text-gray-600 uppercase tracking-widest">No Recent Data</p>
@@ -554,6 +557,7 @@
         let peopleData = []; 
         let activePersonId = null, activeTxType = null; 
         let currentAddMode = null; 
+        let showAllExpenses = false; // Flag for showing more transactions
         
         let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
 
@@ -669,7 +673,10 @@
             document.getElementById('btn-tab-people').classList.remove('active');
             document.getElementById(`btn-tab-${tab}`).classList.add('active');
             if(tab === 'people') renderPeopleGrid();
-            if(tab === 'expenses') renderExpenses();
+            if(tab === 'expenses') {
+                showAllExpenses = false; // Reset toggle on tab switch
+                renderExpenses();
+            }
         }
 
         function openManual() {
@@ -685,13 +692,45 @@
             if(!isNaN(val) && val >= 0) { expensesData.budget = val; saveAll(); renderExpenses(); }
         }
 
-        function getIconForExpense(name) {
-            const n = name.toLowerCase();
-            if(n.includes('food') || n.includes('lunch')) return 'fa-utensils';
-            if(n.includes('taxi') || n.includes('fuel')) return 'fa-car';
-            if(n.includes('bill') || n.includes('recharge')) return 'fa-bolt';
-            return 'fa-receipt';
-        }
+       function getIconForExpense(name) {
+    const n = name.toLowerCase();
+
+    // Food & Dining
+    if (n.includes('food') || n.includes('lunch') || n.includes('dinner') || n.includes('breakfast') || n.includes('restaurant') || n.includes('snack')) return 'fa-utensils';
+    if (n.includes('coffee') || n.includes('cafe') || n.includes('tea') || n.includes('chai')|| n.includes('starbucks')) return 'fa-mug-hot';
+    if (n.includes('grocery') || n.includes('supermarket') || n.includes('mart') || n.includes('fruit') || n.includes('veg')) return 'fa-shopping-basket';
+
+    // Transport
+    if (n.includes('taxi') || n.includes('fuel') || n.includes('gas') || n.includes('petrol') || n.includes('uber') || n.includes('lyft') || n.includes('parking') || n.includes('service')) return 'fa-car';
+    if (n.includes('bus') || n.includes('train') || n.includes('metro') || n.includes('subway') || n.includes('ticket')) return 'fa-bus';
+    if (n.includes('flight') || n.includes('airline') || n.includes('air')) return 'fa-plane';
+
+    // Utilities & Housing
+    if (n.includes('bill') || n.includes('recharge') || n.includes('electric') || n.includes('water') || n.includes('gas') || n.includes('internet') || n.includes('wifi') || n.includes('mobile')) return 'fa-bolt';
+    if (n.includes('rent') || n.includes('home') || n.includes('house') || n.includes('maintenance')) return 'fa-home';
+
+    // Shopping
+    if (n.includes('amazon') || n.includes('flipkart') || n.includes('shopping') || n.includes('buy') || n.includes('store')) return 'fa-shopping-cart';
+    if (n.includes('cloth') || n.includes('shoe') || n.includes('wear') || n.includes('jeans') || n.includes('shirt')) return 'fa-tshirt';
+
+    // Entertainment
+    if (n.includes('movie') || n.includes('cinema') || n.includes('film') || n.includes('netflix') || n.includes('prime') || n.includes('subscription')) return 'fa-film';
+    if (n.includes('game') || n.includes('steam') || n.includes('playstation') || n.includes('xbox')) return 'fa-gamepad';
+
+    // Health & Fitness
+    if (n.includes('doctor') || n.includes('medical') || n.includes('pharmacy') || n.includes('med') || n.includes('hospital')) return 'fa-notes-medical';
+    if (n.includes('gym') || n.includes('fitness') || n.includes('yoga') || n.includes('sport')) return 'fa-dumbbell';
+
+    // Travel
+    if (n.includes('hotel') || n.includes('stay') || n.includes('bnb') || n.includes('trip')) return 'fa-suitcase';
+
+    // Money Transfer / Income
+    if (n.includes('transfer') || n.includes('send') || n.includes('atm') || n.includes('withdraw')) return 'fa-exchange-alt';
+    if (n.includes('salary') || n.includes('income') || n.includes('deposit')) return 'fa-money-bill-wave';
+
+    // Default
+    return 'fa-receipt';
+}
 
         function addExpense() {
             const name = document.getElementById('expenseName').value.trim();
@@ -713,6 +752,12 @@
         }
 
         function filterExpenses() {
+            renderExpenses();
+        }
+
+        // New function to toggle transaction visibility
+        function toggleShowAllExpenses() {
+            showAllExpenses = !showAllExpenses;
             renderExpenses();
         }
 
@@ -744,14 +789,22 @@
             document.getElementById('budgetInput').value = expensesData.budget;
             
             const listEl = document.getElementById('expenseList');
+            const showMoreContainer = document.getElementById('showMoreContainer');
+            const btnShowMore = document.getElementById('btnShowMore');
+            
             listEl.innerHTML = '';
             
             if(filtered.length === 0) {
                 document.getElementById('emptyState').classList.remove('hidden');
                 document.getElementById('emptyState').querySelector('p').innerText = query ? "No Match Found" : "No Recent Data";
+                showMoreContainer.classList.add('hidden');
             } else {
                 document.getElementById('emptyState').classList.add('hidden');
-                filtered.forEach(item => {
+                
+                // Logic for limiting to 10
+                const displayList = showAllExpenses ? filtered : filtered.slice(0, 10);
+                
+                displayList.forEach(item => {
                     listEl.innerHTML += `
                         <div class="flex items-center justify-between px-6 py-5 hover:bg-white/[0.03] transition animate-slide-up border-b border-white/5 last:border-0">
                             <div class="flex items-center gap-5">
@@ -769,6 +822,14 @@
                             </div>
                         </div>`;
                 });
+
+                // Handle "Show More" button visibility
+                if (filtered.length > 10) {
+                    showMoreContainer.classList.remove('hidden');
+                    btnShowMore.innerText = showAllExpenses ? "Show Less" : "Show More";
+                } else {
+                    showMoreContainer.classList.add('hidden');
+                }
             }
         }
 
@@ -896,8 +957,8 @@
 
         function closeMonthlyStats() { document.getElementById('monthlyStatsModal').classList.add('hidden'); }
         function exportCSV() {
-            let csv = "Date,Name,Amount\n";
-            expensesData.list.forEach(item => csv += `${item.date},${item.name},${item.amount}\n`);
+            let csv = "Date,Time,Name,Amount\n";
+            expensesData.list.forEach(item => csv += `${item.date},${item.time},${item.name},${item.amount}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
