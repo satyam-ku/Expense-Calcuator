@@ -11,14 +11,14 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: '#050505',
-                        glass: 'rgba(255, 255, 255, 0.03)',
-                        neonBlue: '#00f3ff',
-                        neonPink: '#ff00ff',
-                        neonGreen: '#00ff9d',
-                        neonPurple: '#bf00ff',
-                        neonRed: '#ff3333',
-                        neonYellow: '#f3ff00'
+                        dark: '#1a1208',
+                        glass: 'rgba(255, 220, 120, 0.03)',
+                        neonBlue: '#f5a623',
+                        neonPink: '#e8714a',
+                        neonGreen: '#7ec87e',
+                        neonPurple: '#c9956e',
+                        neonRed: '#d94f38',
+                        neonYellow: '#f5c842'
                     },
                     animation: {
                         'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
@@ -41,27 +41,27 @@
     </script>
     <style>
         body {
-            background-color: #020202;
+            background-color: #110c06;
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.08), transparent 25%), 
-                radial-gradient(circle at 85% 30%, rgba(255, 0, 255, 0.08), transparent 25%);
+                radial-gradient(circle at 15% 50%, rgba(245, 166, 35, 0.10), transparent 30%), 
+                radial-gradient(circle at 85% 30%, rgba(232, 113, 74, 0.08), transparent 30%);
             background-attachment: fixed;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
         }
         
         .glass-panel {
-            background: rgba(18, 18, 24, 0.65);
+            background: rgba(30, 20, 8, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(245, 166, 35, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(245,200,100,0.07);
         }
 
         .input-glow {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(245, 166, 35, 0.2);
+            color: #f0d9a0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 18px; 
             text-align: center;
@@ -69,9 +69,9 @@
         
         .input-glow:focus {
             outline: none;
-            border-color: #00f3ff;
-            background: rgba(0, 20, 40, 0.8);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            border-color: #f5a623;
+            background: rgba(30, 18, 2, 0.85);
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.18);
             transform: translateY(-2px);
         }
 
@@ -84,10 +84,10 @@
         }
 
         .tab-btn { opacity: 0.5; transition: all 0.3s ease; position: relative; }
-        .tab-btn.active { opacity: 1; color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .tab-btn.active { opacity: 1; color: #f5a623; text-shadow: 0 0 10px rgba(245,166,35,0.4); }
         .tab-btn.active::after {
             content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 3px; background: #00f3ff; border-radius: 10px; box-shadow: 0 0 10px #00f3ff;
+            width: 20px; height: 3px; background: #f5a623; border-radius: 10px; box-shadow: 0 0 10px rgba(245,166,35,0.6);
         }
 
         .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 250px; }
@@ -106,10 +106,10 @@
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f5a623; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen text-base text-gray-100 font-sans selection:bg-neonPink selection:text-white pb-6 overflow-x-hidden">
+<body class="min-h-screen text-base text-amber-100 font-sans selection:bg-amber-600 selection:text-white pb-6 overflow-x-hidden">
 
     <div id="confirm-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
         <div class="glass-panel w-full max-w-xs p-8 rounded-[30px] border border-white/20 text-center animate-pop-in relative">
@@ -125,10 +125,10 @@
         </div>
     </div>
 
-    <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#020202]">
+    <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#110c06]">
         <div class="glass-panel w-full max-w-sm p-10 rounded-[30px] border-t border-white/20 text-center animate-pop-in relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue via-white to-neonPink opacity-50"></div>
-            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-white via-neonBlue to-neonPink">FinCaL</h1>
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-yellow-200 to-orange-400 opacity-60"></div>
+            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-amber-200 via-yellow-400 to-orange-400">FinCaL</h1>
             <p class="text-xs uppercase tracking-[0.4em] text-gray-500 mb-10">Financial Operating System</p>
 
             <div id="login-register" class="view-hidden space-y-6">
@@ -140,24 +140,24 @@
 
             <div id="login-auth" class="view-hidden space-y-6">
                 <div class="mb-8">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-gray-800 to-black border border-white/10 mx-auto flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,243,255,0.1)]">
-                        <i class="fa-solid fa-fingerprint text-4xl text-gray-600"></i>
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-950 to-stone-900 border border-amber-700/20 mx-auto flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(245,166,35,0.1)]">
+                        <i class="fa-solid fa-fingerprint text-4xl text-amber-800"></i>
                     </div>
                     <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Identity</p>
                     <select id="userSelect" class="input-glow w-full p-3 rounded-xl text-base font-bold uppercase tracking-wider bg-black"></select>
                 </div>
-                <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glow w-full p-4 rounded-2xl font-mono text-3xl tracking-[0.5em] text-neonBlue" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-neonBlue to-blue-600 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(0,243,255,0.25)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Unlock Dashboard</button>
+                <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glow w-full p-4 rounded-2xl font-mono text-3xl tracking-[0.5em] text-amber-400" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(245,166,35,0.3)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Unlock Dashboard</button>
                 <div class="flex justify-between mt-8 px-2">
-                    <button onclick="showRegister()" class="text-[10px] text-gray-500 hover:text-neonBlue transition-colors uppercase tracking-widest">+ Create Account</button>
-                    <button onclick="resetSystem()" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
+                    <button onclick="showRegister()" class="text-[10px] text-amber-700 hover:text-amber-400 transition-colors uppercase tracking-widest">+ Create Account</button>
+                    <button onclick="resetSystem()" class="text-[10px] text-amber-900 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="app-view" class="view-hidden touch-pan-y">
-        <header class="pt-8 pb-4 px-6 sticky top-0 z-40 bg-[#020202]/90 backdrop-blur-xl border-b border-white/5">
+        <header class="pt-8 pb-4 px-6 sticky top-0 z-40 bg-[#110c06]/90 backdrop-blur-xl border-b border-amber-900/30">
             <div class="flex justify-between items-center max-w-2xl mx-auto">
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight text-white">Fin <span class="font-light text-gray-500 italic">CaL</span></h1>
@@ -174,13 +174,13 @@
         <main class="max-w-2xl mx-auto px-4 py-6 relative space-y-8">
             <div id="tab-expenses-content" class="flex flex-col gap-8 animate-pop-in">
                 <div class="glass-panel rounded-[35px] p-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-neonBlue blur-[80px] opacity-20"></div>
-                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-neonPink blur-[80px] opacity-10"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500 blur-[80px] opacity-10"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-orange-600 blur-[80px] opacity-8"></div>
                     <div class="relative z-10 grid grid-cols-2 gap-4 items-center">
                         <div class="relative w-40 h-40 mx-auto">
                             <svg viewBox="0 0 36 36" class="circular-chart">
                                 <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path id="ring-progress" class="circle" stroke="#00f3ff" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="ring-progress" class="circle" stroke="#f5a623" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
                                 <span class="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Balance</span>
@@ -192,7 +192,7 @@
                                 <p class="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Monthly Limit</p>
                                 <div class="flex justify-end items-center gap-2">
                                     <span class="text-gray-400 text-base">₹</span>
-                                    <input type="number" id="budgetInput" onchange="setBudget()" placeholder="0" class="bg-transparent border-b border-gray-700 w-24 text-right text-white font-mono text-xl focus:outline-none focus:border-neonBlue transition-colors">
+                                    <input type="number" id="budgetInput" onchange="setBudget()" placeholder="0" class="bg-transparent border-b border-amber-900 w-24 text-right text-amber-100 font-mono text-xl focus:outline-none focus:border-amber-400 transition-colors">
                                 </div>
                             </div>
                             <div>
@@ -333,7 +333,7 @@
 
                             <div class="flex gap-2 mt-1">
                                 <button onclick="cancelAddPerson()" class="h-12 flex-1 rounded-xl border border-white/10 text-gray-500 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
-                                <button onclick="confirmAddPerson()" class="h-12 flex-1 bg-neonBlue rounded-xl text-black font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:bg-white">Save</button>
+                                <button onclick="confirmAddPerson()" class="h-12 flex-1 bg-amber-500 rounded-xl text-black font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(245,166,35,0.3)] hover:bg-amber-400">Save</button>
                             </div>
                         </div>
                    </div>
@@ -349,7 +349,7 @@
             </div>
         </main>
 
-        <div id="personDetailOverlay" class="fixed inset-0 z-50 bg-[#020202] closed flex flex-col h-full w-full overflow-hidden transition-transform duration-300">
+        <div id="personDetailOverlay" class="fixed inset-0 z-50 bg-[#110c06] closed flex flex-col h-full w-full overflow-hidden transition-transform duration-300">
             <div class="p-6 flex items-center justify-between border-b border-white/10">
                 <button onclick="closePersonDetails()" class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10"><i class="fa-solid fa-arrow-left text-lg"></i></button>
                 <div class="text-center">
@@ -362,7 +362,7 @@
             <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-8">
                 <div class="glass-panel p-10 rounded-full w-72 h-72 flex flex-col items-center justify-center relative border border-white/10 mt-6 shrink-0">
                     <div class="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
-                    <div class="absolute w-40 h-40 bg-neonBlue blur-[70px] opacity-10" id="detailGlow"></div>
+                    <div class="absolute w-40 h-40 bg-amber-500 blur-[70px] opacity-10" id="detailGlow"></div>
                     <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-3 relative z-10">Net Standing</p>
                     <div class="text-5xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
                     <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 relative z-10 flex flex-col items-center gap-1 min-w-[120px]">
