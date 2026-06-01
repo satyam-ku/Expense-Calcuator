@@ -95,6 +95,7 @@
         .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
         
         .view-hidden { display: none !important; }
+        .view-hidden-override { display: none !important; }
         #personDetailOverlay.open { transform: translateY(0); }
         #personDetailOverlay.closed { transform: translateY(100%); }
 
@@ -163,9 +164,10 @@
                     <h1 class="text-xl font-extrabold tracking-tight text-white">Fin <span class="font-light text-gray-500 italic">CaL</span></h1>
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest" id="headerUsername">User</p>
                 </div>
-                <div class="flex gap-4 text-xs uppercase tracking-widest font-bold">
-                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-3 py-2">Personal</button>
-                    <button onclick="switchTab('people')" id="btn-tab-people" class="tab-btn px-3 py-2">People</button>
+                <div class="flex gap-2 text-xs uppercase tracking-widest font-bold">
+                    <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="tab-btn active px-2 py-2">Personal</button>
+                    <button onclick="switchTab('people')" id="btn-tab-people" class="tab-btn px-2 py-2">People</button>
+                    <button onclick="switchTab('notes')" id="btn-tab-notes" class="tab-btn px-2 py-2">Notes</button>
                 </div>
                 <button onclick="logout()" class="text-gray-600 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full"><i class="fa-solid fa-power-off text-sm"></i></button>
             </div>
@@ -184,7 +186,7 @@
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
                                 <span class="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Balance</span>
-                                <span class="text-2xl font-bold font-mono text-white tracking-tight">₹<span id="displayBalance">0</span></span>
+                                <span class="text-2xl font-bold font-mono text-white tracking-tight">₹<span id="displayBalance">0.00</span></span>
                             </div>
                         </div>
                         <div class="text-right space-y-5">
@@ -192,12 +194,12 @@
                                 <p class="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Monthly Limit</p>
                                 <div class="flex justify-end items-center gap-2">
                                     <span class="text-gray-400 text-base">₹</span>
-                                    <input type="number" id="budgetInput" onchange="setBudget()" placeholder="0" class="bg-transparent border-b border-amber-900 w-24 text-right text-amber-100 font-mono text-xl focus:outline-none focus:border-amber-400 transition-colors">
+                                    <input type="number" id="budgetInput" step="0.01" onchange="setBudget()" placeholder="0.00" class="bg-transparent border-b border-amber-900 w-24 text-right text-amber-100 font-mono text-xl focus:outline-none focus:border-amber-400 transition-colors">
                                 </div>
                             </div>
                             <div>
                                 <p class="text-[11px] text-gray-500 uppercase tracking-widest mb-1">Total Spent</p>
-                                <p class="text-xl font-mono text-red-400 font-bold drop-shadow-[0_0_10px_rgba(255,50,50,0.4)]">₹<span id="displaySpent">0</span></p>
+                                <p class="text-xl font-mono text-red-400 font-bold drop-shadow-[0_0_10px_rgba(255,50,50,0.4)]">₹<span id="displaySpent">0.00</span></p>
                                 <button onclick="showBudgetHistory()" class="text-[9px] text-neonBlue/80 hover:text-neonBlue underline uppercase tracking-widest mt-1">View Analytics</button>
                             </div>
                         </div>
@@ -214,7 +216,7 @@
                             <div class="grid grid-cols-4 gap-2">
                                 <div class="col-span-3 relative">
                                     <span class="absolute left-5 top-1/2 -translate-y-1/2 text-neonGreen font-bold text-lg">₹</span>
-                                    <input type="number" id="expenseAmount" placeholder="0" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-10 pr-4 text-white font-mono text-xl focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all">
+                                    <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-10 pr-4 text-white font-mono text-xl focus:outline-none focus:border-neonGreen focus:bg-white/10 transition-all">
                                 </div>
                                 <button onclick="addExpense()" class="col-span-1 bg-neonGreen text-black rounded-xl flex items-center justify-center hover:bg-white transition-colors shadow-[0_0_15px_rgba(0,255,157,0.3)]">
                                     <i class="fa-solid fa-plus text-2xl"></i>
@@ -265,7 +267,7 @@
                     <div class="flex justify-between items-end relative z-10">
                         <div>
                             <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Owed To Me (Normal)</p>
-                            <h2 class="text-3xl font-mono font-bold text-white">₹<span id="displayNormalReceivable">0</span></h2>
+                            <h2 class="text-3xl font-mono font-bold text-white">₹<span id="displayNormalReceivable">0.00</span></h2>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-neonBlue/10 flex items-center justify-center border border-neonBlue/20 text-neonBlue">
                             <i class="fa-solid fa-hand-holding-dollar"></i>
@@ -347,7 +349,95 @@
                     <p class="text-sm text-gray-600 uppercase tracking-widest">No Active Ledgers</p>
                 </div>
             </div>
+
+            <!-- Notes Tab Content Container -->
+            <div id="tab-notes-content" class="hidden animate-pop-in flex flex-col gap-6">
+                <div class="glass-panel rounded-[30px] p-1 relative overflow-hidden">
+                    <div class="bg-black/40 rounded-[28px] p-5">
+                        <h3 class="text-xs text-gray-500 uppercase tracking-widest mb-3 ml-1">Create New Note</h3>
+                        <div class="flex flex-col gap-3">
+                            <input type="text" id="noteTitle" placeholder="NOTE TITLE..." class="bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-white text-base focus:outline-none focus:border-neonBlue w-full">
+                            
+                            <div class="relative w-full">
+                                <textarea id="noteContent" rows="3" oninput="updateNoteCharCount('noteContent', 'noteCharCounter')" placeholder="WRITE NOTE CONTENT HERE..." class="bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-neonBlue w-full pr-12 resize-none custom-scrollbar"></textarea>
+                                <div id="noteCharCounter" class="absolute bottom-3 right-3 text-[9px] text-gray-600 font-mono">0 chars</div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-1">
+                                <div class="flex gap-4 items-center">
+                                    <div class="flex gap-1 items-center">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">Tag:</span>
+                                        <select id="noteTagColor" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-amber-100 uppercase tracking-wider focus:outline-none">
+                                            <option value="neonBlue" class="bg-black text-amber-500">Blue/Orange</option>
+                                            <option value="neonGreen" class="bg-black text-green-400">Green</option>
+                                            <option value="neonPurple" class="bg-black text-amber-700">Purple/Brown</option>
+                                            <option value="neonPink" class="bg-black text-orange-500">Pink</option>
+                                        </select>
+                                    </div>
+                                    <label class="flex items-center gap-1 cursor-pointer select-none">
+                                        <input type="checkbox" id="notePinnedState" class="accent-amber-500 rounded">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-wider"><i class="fa-solid fa-thumbtack text-[9px] mr-0.5"></i> Pin</span>
+                                    </label>
+                                </div>
+                                <button onclick="addNote()" class="h-10 px-6 bg-amber-500 text-black font-bold uppercase text-xs tracking-widest rounded-xl shadow-[0_0_15px_rgba(245,166,35,0.3)] hover:bg-amber-400">Save Note</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 px-2">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-700 text-[10px]"></i>
+                        <input type="text" id="noteSearch" oninput="renderNotes()" placeholder="SEARCH NOTES BY TITLE OR CONTENT..." class="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-[10px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-neonBlue transition-all">
+                    </div>
+                </div>
+
+                <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="notesEmptyState" class="hidden py-16 text-center">
+                    <div class="w-20 h-20 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-4 border border-white/5">
+                        <i class="fa-solid fa-note-sticky text-2xl text-gray-700"></i>
+                    </div>
+                    <p class="text-xs text-gray-600 uppercase tracking-widest">No Notes Found</p>
+                </div>
+            </div>
         </main>
+
+        <!-- Dynamic Translucent Viewing/Editing Sheet Context for Notes Platform -->
+        <div id="noteInlineViewerOverlay" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 animate-pop-in">
+            <div class="glass-panel w-full max-w-md p-6 rounded-[30px] border border-white/20 relative flex flex-col max-h-[85vh]">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
+                    <span id="noteViewMetaLabel" class="text-[10px] text-gray-500 font-mono uppercase font-bold tracking-widest">Live Document Pipeline</span>
+                    <div class="flex items-center gap-3">
+                        <button id="noteViewPinBtn" class="text-xs text-gray-500 hover:text-amber-400 transition-colors"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button id="noteViewSpeechBtn" class="text-xs text-gray-500 hover:text-emerald-400 transition-colors"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
+                    <input type="text" id="noteViewTitleField" class="w-full bg-transparent border-b border-white/5 text-lg font-bold text-white uppercase tracking-wide py-1 focus:outline-none focus:border-neonBlue placeholder-gray-600" placeholder="NOTE TITLE...">
+                    
+                    <div class="relative w-full">
+                        <textarea id="noteViewContentField" rows="8" oninput="updateNoteCharCount('noteViewContentField', 'noteViewCharCounter')" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-300 leading-relaxed focus:outline-none focus:border-neonBlue focus:bg-white/10 transition-all resize-none custom-scrollbar" placeholder="CONTENT BODY..."></textarea>
+                        <div id="noteViewCharCounter" class="absolute bottom-3 right-3 text-[9px] text-gray-600 font-mono">0 chars</div>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-black/20 p-3 rounded-xl border border-white/5">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Category Scope:</span>
+                        <select id="noteViewTagSelector" class="bg-white/5 border border-white/5 rounded-lg px-2 py-1 text-xs text-amber-100 uppercase tracking-wider focus:outline-none">
+                            <option value="neonBlue" class="bg-black text-amber-500">Blue/Orange</option>
+                            <option value="neonGreen" class="bg-black text-green-400">Green</option>
+                            <option value="neonPurple" class="bg-black text-amber-700">Purple/Brown</option>
+                            <option value="neonPink" class="bg-black text-orange-500">Pink</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-6 pt-3 border-t border-white/5">
+                    <button onclick="closeNoteViewerOverlay()" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:bg-white/10">Dismiss</button>
+                    <button onclick="commitNoteViewerSave()" class="py-3.5 rounded-xl bg-amber-500 text-black font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:scale-[1.01] transition-transform">Commit Save</button>
+                </div>
+            </div>
+        </div>
 
         <div id="personDetailOverlay" class="fixed inset-0 z-50 bg-[#110c06] closed flex flex-col h-full w-full overflow-hidden transition-transform duration-300">
             <div class="p-6 flex items-center justify-between border-b border-white/10">
@@ -364,7 +454,7 @@
                     <div class="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
                     <div class="absolute w-40 h-40 bg-amber-500 blur-[70px] opacity-10" id="detailGlow"></div>
                     <p class="text-gray-500 text-xs uppercase tracking-[0.3em] mb-3 relative z-10">Net Standing</p>
-                    <div class="text-5xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0</div>
+                    <div class="text-5xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0.00</div>
                     <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 relative z-10 flex flex-col items-center gap-1 min-w-[120px]">
                         <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" id="detailStatus">Settled</p>
                     </div>
@@ -419,7 +509,7 @@
                         <input type="text" id="txDesc" placeholder="Description (e.g. Lunch)" class="input-glow w-full p-4 rounded-2xl text-base">
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                            <input type="number" id="txAmt" placeholder="0" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl pl-10">
+                            <input type="number" id="txAmt" step="0.01" placeholder="0.00" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl pl-10">
                         </div>
                         <div class="grid grid-cols-2 gap-3 pt-3">
                             <button onclick="closeTxModal()" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
@@ -462,6 +552,43 @@
                     <div class="flex gap-2 mt-4">
                         <button onclick="closeEditInterestModal()" class="h-12 flex-1 rounded-xl border border-white/10 text-gray-500 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
                         <button onclick="updateInterestDetails()" class="h-12 flex-1 bg-neonPurple rounded-xl text-white font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(191,0,255,0.3)] hover:scale-[1.02] transition-transform">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Expense/Transaction Modal -->
+        <div id="editTxModal" class="hidden fixed inset-0 z-[80] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-xs p-8 rounded-[30px] border border-white/20 text-center animate-pop-in relative">
+                <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white">Edit Record</h3>
+                <div class="space-y-5">
+                    <input type="text" id="editTxNameDesc" placeholder="Name / Description" class="input-glow w-full p-4 rounded-2xl text-base">
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <input type="number" id="editTxAmount" step="0.01" placeholder="0.00" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl pl-10">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-3">
+                        <button onclick="closeEditTxModal()" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                        <button onclick="submitEditedTx()" class="py-3.5 rounded-xl bg-amber-500 text-black font-bold text-xs shadow-[0_0_20px_rgba(245,166,35,0.3)]">UPDATE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Historical / Past Month Expense Modal -->
+        <div id="addPastExpenseModal" class="hidden fixed inset-0 z-[85] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-xs p-8 rounded-[30px] border border-white/20 text-center animate-pop-in relative">
+                <h3 class="text-base font-bold mb-1 uppercase tracking-widest text-white">Add Past Expense</h3>
+                <p id="pastTargetMonthLabel" class="text-xs text-neonBlue uppercase tracking-widest mb-6 font-bold">Month</p>
+                <div class="space-y-5">
+                    <input type="text" id="pastExpenseName" placeholder="Expense Name..." class="input-glow w-full p-4 rounded-2xl text-base">
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <input type="number" id="pastExpenseAmount" step="0.01" placeholder="0.00" class="input-glow w-full p-4 rounded-2xl font-mono text-2xl pl-10">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-3">
+                        <button onclick="closePastExpenseModal()" class="py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                        <button onclick="submitPastExpenseTx()" class="py-3.5 rounded-xl bg-neonGreen text-black font-bold text-xs shadow-[0_0_20px_rgba(0,255,157,0.3)]">ADD DATA</button>
                     </div>
                 </div>
             </div>
@@ -555,15 +682,17 @@
         let currentTab = 'expenses';
         let expensesData = { budget: 0, list: [], lastActiveMonth: '', historyStats: {} };
         let peopleData = []; 
-        let activePersonId = null, activeTxType = null; 
-        let currentAddMode = null; 
-        let showAllExpenses = false; // Flag for showing more transactions
+        let notesData = []; 
         
+        let editingTargetMode = null; 
+        let editingTxId = null;
+        let selectedPastMonth = null;
+        let activeNoteViewingId = null; 
+
         let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
 
         window.onload = function() { initSystem(); initSwipeListeners(); };
 
-        // --- Custom Confirmation Logic ---
         function customConfirm(title, message) {
             return new Promise((resolve) => {
                 const modal = document.getElementById('confirm-modal');
@@ -608,11 +737,20 @@
             if(!document.getElementById('addPersonContainer').classList.contains('hidden')) return;
             if(!document.getElementById('historyModal').classList.contains('hidden')) return;
             if(!document.getElementById('manualModal').classList.contains('hidden')) return; 
+            if(!document.getElementById('editTxModal').classList.contains('hidden')) return; 
+            if(!document.getElementById('addPastExpenseModal').classList.contains('hidden')) return; 
+            if(!document.getElementById('noteInlineViewerOverlay').classList.contains('hidden')) return; 
 
             const xDiff = touchStartX - touchEndX;
             const yDiff = touchStartY - touchEndY;
             if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) { 
-                if (xDiff > 0) switchTab('people'); else switchTab('expenses');
+                if (xDiff > 0) {
+                    if (currentTab === 'expenses') switchTab('people');
+                    else if (currentTab === 'people') switchTab('notes');
+                } else {
+                    if (currentTab === 'notes') switchTab('people');
+                    else if (currentTab === 'people') switchTab('expenses');
+                }
             }
         }
 
@@ -668,13 +806,18 @@
             currentTab = tab; 
             document.getElementById('tab-expenses-content').classList.add('hidden');
             document.getElementById('tab-people-content').classList.add('hidden');
+            document.getElementById('tab-notes-content').classList.add('hidden');
             document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
+            
             document.getElementById('btn-tab-expenses').classList.remove('active');
             document.getElementById('btn-tab-people').classList.remove('active');
+            document.getElementById('btn-tab-notes').classList.remove('active');
             document.getElementById(`btn-tab-${tab}`).classList.add('active');
+            
             if(tab === 'people') renderPeopleGrid();
+            if(tab === 'notes') renderNotes();
             if(tab === 'expenses') {
-                showAllExpenses = false; // Reset toggle on tab switch
+                showAllExpenses = false; 
                 renderExpenses();
             }
         }
@@ -692,45 +835,27 @@
             if(!isNaN(val) && val >= 0) { expensesData.budget = val; saveAll(); renderExpenses(); }
         }
 
-       function getIconForExpense(name) {
-    const n = name.toLowerCase();
-
-    // Food & Dining
-    if (n.includes('food') || n.includes('lunch') || n.includes('dinner') || n.includes('breakfast') || n.includes('restaurant') || n.includes('snack')) return 'fa-utensils';
-    if (n.includes('coffee') || n.includes('cafe') || n.includes('tea') || n.includes('chai')|| n.includes('starbucks')) return 'fa-mug-hot';
-    if (n.includes('grocery') || n.includes('supermarket') || n.includes('mart') || n.includes('fruit') || n.includes('veg')) return 'fa-shopping-basket';
-
-    // Transport
-    if (n.includes('taxi') || n.includes('fuel') || n.includes('gas') || n.includes('petrol') || n.includes('uber') || n.includes('lyft') || n.includes('parking') || n.includes('service')) return 'fa-car';
-    if (n.includes('bus') || n.includes('train') || n.includes('metro') || n.includes('subway') || n.includes('ticket')) return 'fa-bus';
-    if (n.includes('flight') || n.includes('airline') || n.includes('air')) return 'fa-plane';
-
-    // Utilities & Housing
-    if (n.includes('bill') || n.includes('recharge') || n.includes('electric') || n.includes('water') || n.includes('gas') || n.includes('internet') || n.includes('wifi') || n.includes('mobile')) return 'fa-bolt';
-    if (n.includes('rent') || n.includes('home') || n.includes('house') || n.includes('maintenance')) return 'fa-home';
-
-    // Shopping
-    if (n.includes('amazon') || n.includes('flipkart') || n.includes('shopping') || n.includes('buy') || n.includes('store')) return 'fa-shopping-cart';
-    if (n.includes('cloth') || n.includes('shoe') || n.includes('wear') || n.includes('jeans') || n.includes('shirt')) return 'fa-tshirt';
-
-    // Entertainment
-    if (n.includes('movie') || n.includes('cinema') || n.includes('film') || n.includes('netflix') || n.includes('prime') || n.includes('subscription')) return 'fa-film';
-    if (n.includes('game') || n.includes('steam') || n.includes('playstation') || n.includes('xbox')) return 'fa-gamepad';
-
-    // Health & Fitness
-    if (n.includes('doctor') || n.includes('medical') || n.includes('pharmacy') || n.includes('med') || n.includes('hospital')) return 'fa-notes-medical';
-    if (n.includes('gym') || n.includes('fitness') || n.includes('yoga') || n.includes('sport')) return 'fa-dumbbell';
-
-    // Travel
-    if (n.includes('hotel') || n.includes('stay') || n.includes('bnb') || n.includes('trip')) return 'fa-suitcase';
-
-    // Money Transfer / Income
-    if (n.includes('transfer') || n.includes('send') || n.includes('atm') || n.includes('withdraw')) return 'fa-exchange-alt';
-    if (n.includes('salary') || n.includes('income') || n.includes('deposit')) return 'fa-money-bill-wave';
-
-    // Default
-    return 'fa-receipt';
-}
+        function getIconForExpense(name) {
+            const n = name.toLowerCase();
+            if (n.includes('food') || n.includes('lunch') || n.includes('dinner') || n.includes('breakfast') || n.includes('restaurant') || n.includes('snack')) return 'fa-utensils';
+            if (n.includes('coffee') || n.includes('cafe') || n.includes('tea') || n.includes('chai')|| n.includes('starbucks')) return 'fa-mug-hot';
+            if (n.includes('grocery') || n.includes('supermarket') || n.includes('mart') || n.includes('fruit') || n.includes('veg')) return 'fa-shopping-basket';
+            if (n.includes('taxi') || n.includes('fuel') || n.includes('gas') || n.includes('petrol') || n.includes('uber') || n.includes('lyft') || n.includes('parking') || n.includes('service')) return 'fa-car';
+            if (n.includes('bus') || n.includes('train') || n.includes('metro') || n.includes('subway') || n.includes('ticket')) return 'fa-bus';
+            if (n.includes('flight') || n.includes('airline') || n.includes('air')) return 'fa-plane';
+            if (n.includes('bill') || n.includes('recharge') || n.includes('electric') || n.includes('water') || n.includes('gas') || n.includes('internet') || n.includes('wifi') || n.includes('mobile')) return 'fa-bolt';
+            if (n.includes('rent') || n.includes('home') || n.includes('house') || n.includes('maintenance')) return 'fa-home';
+            if (n.includes('amazon') || n.includes('flipkart') || n.includes('shopping') || n.includes('buy') || n.includes('store')) return 'fa-shopping-cart';
+            if (n.includes('cloth') || n.includes('shoe') || n.includes('wear') || n.includes('jeans') || n.includes('shirt')) return 'fa-tshirt';
+            if (n.includes('movie') || n.includes('cinema') || n.includes('film') || n.includes('netflix') || n.includes('prime') || n.includes('subscription')) return 'fa-film';
+            if (n.includes('game') || n.includes('steam') || n.includes('playstation') || n.includes('xbox')) return 'fa-gamepad';
+            if (n.includes('doctor') || n.includes('medical') || n.includes('pharmacy') || n.includes('med') || n.includes('hospital')) return 'fa-notes-medical';
+            if (n.includes('gym') || n.includes('fitness') || n.includes('yoga') || n.includes('sport')) return 'fa-dumbbell';
+            if (n.includes('hotel') || n.includes('stay') || n.includes('bnb') || n.includes('trip')) return 'fa-suitcase';
+            if (n.includes('transfer') || n.includes('send') || n.includes('atm') || n.includes('withdraw')) return 'fa-exchange-alt';
+            if (n.includes('salary') || n.includes('income') || n.includes('deposit')) return 'fa-money-bill-wave';
+            return 'fa-receipt';
+        }
 
         function addExpense() {
             const name = document.getElementById('expenseName').value.trim();
@@ -755,7 +880,6 @@
             renderExpenses();
         }
 
-        // New function to toggle transaction visibility
         function toggleShowAllExpenses() {
             showAllExpenses = !showAllExpenses;
             renderExpenses();
@@ -801,7 +925,6 @@
             } else {
                 document.getElementById('emptyState').classList.add('hidden');
                 
-                // Logic for limiting to 10
                 const displayList = showAllExpenses ? filtered : filtered.slice(0, 10);
                 
                 displayList.forEach(item => {
@@ -818,12 +941,15 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-white font-mono font-bold text-lg">₹${formatMoney(item.amount)}</p>
-                                <button onclick="deleteExpense(${item.id})" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase">DEL</button>
+                                <div class="flex gap-2 justify-end mt-1">
+                                    <button onclick="openEditTxModal('expense', ${item.id})" class="text-[10px] text-neonBlue hover:text-white transition-colors uppercase">EDIT</button>
+                                    <span class="text-[10px] text-gray-700">|</span>
+                                    <button onclick="deleteExpense(${item.id})" class="text-[10px] text-gray-600 hover:text-red-500 transition-colors uppercase">DEL</button>
+                                </div>
                             </div>
                         </div>`;
                 });
 
-                // Handle "Show More" button visibility
                 if (filtered.length > 10) {
                     showMoreContainer.classList.remove('hidden');
                     btnShowMore.innerText = showAllExpenses ? "Show Less" : "Show More";
@@ -860,10 +986,13 @@
             allData.forEach(d => {
                 const isCurrent = d.month === currentMonth;
                 listEl.innerHTML += `
-                <div class="bg-white/5 p-5 rounded-xl border ${isCurrent ? 'border-neonBlue/30' : 'border-white/5'}">
+                <div class="bg-white/5 p-5 rounded-xl border ${isCurrent ? 'border-neonBlue/30' : 'border-white/5'} relative">
+                    <button onclick="closeMonthlyStats(); openPastExpenseModal('${d.month}')" class="absolute top-4 right-4 text-[10px] text-neonGreen font-bold uppercase tracking-wider bg-white/5 border border-neonGreen/20 px-2 py-1 rounded hover:bg-neonGreen/10 flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> Add
+                    </button>
                     <div class="flex justify-between items-center mb-3">
                         <span class="text-lg font-bold text-white uppercase tracking-widest">${d.month} ${isCurrent ? '<span class="text-[9px] bg-neonBlue text-black px-1.5 py-0.5 rounded ml-2">LIVE</span>' : ''}</span>
-                        <span class="text-sm font-mono text-gray-400">Limit: ₹${formatMoney(d.limit)}</span>
+                        <span class="text-sm font-mono text-gray-400 mr-16">Limit: ₹${formatMoney(d.limit)}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div><p class="text-[10px] text-gray-500 uppercase">Spent</p><p class="text-neonRed font-mono font-bold">₹${formatMoney(d.spent)}</p></div>
@@ -919,9 +1048,9 @@
                         txHtml += `<div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span><span class="text-[10px] font-mono font-bold text-neonBlue">₹${formatMoney(dailyGroups[day].total)}</span></div>`;
                         dailyGroups[day].list.forEach(t => {
                             if(mode === 'expense') {
-                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div><div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div></div><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span></div>`;
+                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div><div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div></div><div class="text-right flex items-center gap-3"><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span><button onclick="closeHistory(); openEditTxModal('expense', ${t.id})" class="text-[9px] text-neonBlue uppercase">EDIT</button></div></div>`;
                             } else {
-                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span></div>`;
+                                txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div><div class="text-right flex items-center gap-3"><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span><button onclick="closeHistory(); openEditTxModal('ledger', ${t.id})" class="text-[9px] text-neonBlue uppercase">EDIT</button></div></div>`;
                             }
                         });
                     });
@@ -940,6 +1069,297 @@
 
         function closeHistory() { document.getElementById('historyModal').classList.add('hidden'); }
 
+        function openEditTxModal(mode, id) {
+            editingTargetMode = mode;
+            editingTxId = id;
+            let currentName = "";
+            let currentAmt = 0;
+
+            if (mode === 'expense') {
+                const item = expensesData.list.find(e => e.id === id);
+                if (!item) return;
+                currentName = item.name;
+                currentAmt = item.amount;
+            } else if (mode === 'ledger') {
+                const p = peopleData.find(x => x.id === activePersonId);
+                if (!p) return;
+                const tx = p.transactions.find(t => t.id === id);
+                if (!tx) return;
+                currentName = tx.desc || "";
+                currentAmt = tx.amount;
+            }
+
+            document.getElementById('editTxNameDesc').value = currentName;
+            document.getElementById('editTxAmount').value = currentAmt;
+            document.getElementById('editTxModal').classList.remove('hidden');
+        }
+
+        function closeEditTxModal() {
+            document.getElementById('editTxModal').classList.add('hidden');
+            editingTargetMode = null;
+            editingTxId = null;
+        }
+
+        function submitEditedTx() {
+            const newName = document.getElementById('editTxNameDesc').value.trim();
+            const newAmt = parseFloat(document.getElementById('editTxAmount').value);
+            if (isNaN(newAmt) || newAmt <= 0) return alert("Please enter a valid amount");
+
+            if (editingTargetMode === 'expense') {
+                const item = expensesData.list.find(e => e.id === editingTxId);
+                if (item) {
+                    item.name = newName;
+                    item.amount = newAmt;
+                    item.icon = getIconForExpense(newName);
+                }
+            } else if (editingTargetMode === 'ledger') {
+                const p = peopleData.find(x => x.id === activePersonId);
+                if (p) {
+                    const tx = p.transactions.find(t => t.id === editingTxId);
+                    if (tx) {
+                        tx.desc = newName;
+                        tx.amount = newAmt;
+                    }
+                }
+            }
+
+            saveAll();
+            closeEditTxModal();
+            
+            if(expensesData.historyStats) {
+                Object.keys(expensesData.historyStats).forEach(m => {
+                    const mItems = expensesData.list.filter(item => item.date.includes(m));
+                    expensesData.historyStats[m].spent = mItems.reduce((sum, i) => sum + i.amount, 0);
+                });
+            }
+
+            if (currentTab === 'expenses') renderExpenses();
+            const p = peopleData.find(x => x.id === activePersonId);
+            if (p && document.getElementById('personDetailOverlay').classList.contains('open')) {
+                renderPersonDetailsInternal(p);
+            }
+        }
+
+        function openPastExpenseModal(month) {
+            selectedPastMonth = month;
+            document.getElementById('pastTargetMonthLabel').innerText = `Target Month: ${month}`;
+            document.getElementById('pastExpenseName').value = "";
+            document.getElementById('pastExpenseAmount').value = "";
+            document.getElementById('addPastExpenseModal').classList.remove('hidden');
+        }
+
+        function closePastExpenseModal() {
+            document.getElementById('addPastExpenseModal').classList.add('hidden');
+            selectedPastMonth = null;
+        }
+
+        function submitPastExpenseTx() {
+            const name = document.getElementById('pastExpenseName').value.trim();
+            const amt = parseFloat(document.getElementById('pastExpenseAmount').value);
+            if (!name || isNaN(amt) || amt <= 0) return alert("Valid name and amount required");
+
+            const currentMonthName = new Date().toLocaleDateString('en-IN', {month:'short'});
+            const dateStr = `28 ${selectedPastMonth}, 11:59 PM`;
+            
+            expensesData.list.unshift({
+                id: Date.now(),
+                name: name,
+                amount: amt,
+                date: dateStr,
+                icon: getIconForExpense(name)
+            });
+
+            if (selectedPastMonth !== currentMonthName) {
+                if (!expensesData.historyStats) expensesData.historyStats = {};
+                if (!expensesData.historyStats[selectedPastMonth]) {
+                    expensesData.historyStats[selectedPastMonth] = { limit: 0, spent: 0 };
+                }
+                expensesData.historyStats[selectedPastMonth].spent += amt;
+            }
+
+            saveAll();
+            closePastExpenseModal();
+            if (currentTab === 'expenses') renderExpenses();
+            showBudgetHistory(); 
+        }
+
+        /* --- IMMERSIVE INTEGRATED NOTES VIEW & UPDATE ENGINE --- */
+        function updateNoteCharCount(fieldId, counterId) {
+            const content = document.getElementById(fieldId).value;
+            document.getElementById(counterId).innerText = `${content.length} chars`;
+        }
+
+        function triggerSpeechPlayback(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const textCleanup = text.replace(/<\/?[^>]+(>|$)/g, "");
+                const utterance = new SpeechSynthesisUtterance(textCleanup);
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Audio playback synthesis engine missing or unvetted.");
+            }
+        }
+
+        function openNoteViewerOverlay(id) {
+            const targetNote = notesData.find(n => n.id === id);
+            if (!targetNote) return;
+
+            activeNoteViewingId = id;
+            document.getElementById('noteViewTitleField').value = targetNote.title;
+            document.getElementById('noteViewContentField').value = targetNote.content;
+            document.getElementById('noteViewTagSelector').value = targetNote.colorCode || 'neonBlue';
+            
+            const pinBtn = document.getElementById('noteViewPinBtn');
+            if (targetNote.isPinned) {
+                pinBtn.className = "text-xs text-amber-400";
+            } else {
+                pinBtn.className = "text-xs text-gray-500 hover:text-amber-400";
+            }
+            
+            pinBtn.onclick = function(e) {
+                e.stopPropagation();
+                togglePinNoteState(id);
+                const updatedNote = notesData.find(n => n.id === id);
+                pinBtn.className = updatedNote.isPinned ? "text-xs text-amber-400" : "text-xs text-gray-500 hover:text-amber-400";
+            };
+
+            const speechBtn = document.getElementById('noteViewSpeechBtn');
+            speechBtn.onclick = function(e) {
+                e.stopPropagation();
+                const textVal = document.getElementById('noteViewContentField').value;
+                triggerSpeechPlayback(textVal);
+            };
+
+            document.getElementById('noteViewMetaLabel').innerText = `Logged: ${targetNote.date}`;
+            updateNoteCharCount('noteViewContentField', 'noteViewCharCounter');
+            
+            document.getElementById('noteInlineViewerOverlay').classList.remove('hidden');
+        }
+
+        function closeNoteViewerOverlay() {
+            document.getElementById('noteInlineViewerOverlay').classList.add('hidden');
+            activeNoteViewingId = null;
+        }
+
+        function commitNoteViewerSave() {
+            if (activeNoteViewingId === null) return;
+            const newTitle = document.getElementById('noteViewTitleField').value.trim();
+            const newContent = document.getElementById('noteViewContentField').value.trim();
+            const newTag = document.getElementById('noteViewTagSelector').value;
+
+            if (!newTitle || !newContent) return alert("Note inputs cannot remain blank");
+
+            const targetIdx = notesData.findIndex(n => n.id === activeNoteViewingId);
+            if (targetIdx !== -1) {
+                const now = new Date();
+                const timestamp = now.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ', ' + now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
+                
+                notesData[targetIdx].title = newTitle;
+                notesData[targetIdx].content = newContent;
+                notesData[targetIdx].colorCode = newTag;
+                notesData[targetIdx].date = timestamp + " (Edited)";
+            }
+
+            saveAll();
+            closeNoteViewerOverlay();
+            renderNotes();
+        }
+
+        async function togglePinNoteState(id) {
+            const targetNote = notesData.find(n => n.id === id);
+            if(targetNote) {
+                targetNote.isPinned = !targetNote.isPinned;
+                saveAll();
+                renderNotes();
+            }
+        }
+
+        function addNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const text = document.getElementById('noteContent').value.trim();
+            const tagColor = document.getElementById('noteTagColor').value;
+            const isPinned = document.getElementById('notePinnedState').checked;
+            
+            if(!title || !text) return alert("Note Title and Content required");
+            
+            const now = new Date();
+            const timestamp = now.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + ', ' + now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
+            
+            notesData.unshift({
+                id: Date.now(),
+                title: title,
+                content: text,
+                date: timestamp,
+                colorCode: tagColor,
+                isPinned: isPinned
+            });
+
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('notePinnedState').checked = false;
+            updateNoteCharCount('noteContent', 'noteCharCounter');
+
+            saveAll();
+            renderNotes();
+        }
+
+        function renderNotes() {
+            const query = document.getElementById('noteSearch').value.toLowerCase();
+            const grid = document.getElementById('notesGrid');
+            grid.innerHTML = '';
+
+            let filtered = [...notesData];
+            if(query) {
+                filtered = filtered.filter(n => n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query));
+            }
+
+            filtered.sort((a, b) => {
+                const pA = a.isPinned ? 1 : 0;
+                const pB = b.isPinned ? 1 : 0;
+                return pB - pA; 
+            });
+
+            if(filtered.length === 0) {
+                document.getElementById('notesEmptyState').classList.remove('hidden');
+            } else {
+                document.getElementById('notesEmptyState').classList.add('hidden');
+                filtered.forEach(note => {
+                    let borderClass = 'border-neonBlue/20';
+                    let textClass = 'text-neonBlue';
+                    if(note.colorCode === 'neonGreen') { borderClass = 'border-neonGreen/20'; textClass = 'text-neonGreen'; }
+                    else if(note.colorCode === 'neonPurple') { borderClass = 'border-neonPurple/20'; textClass = 'text-neonPurple'; }
+                    else if(note.colorCode === 'neonPink') { borderClass = 'border-neonPink/20'; textClass = 'text-neonPink'; }
+
+                    grid.innerHTML += `
+                        <div onclick="openNoteViewerOverlay(${note.id})" class="glass-panel p-5 rounded-[22px] border ${borderClass} flex flex-col justify-between relative group animate-slide-up cursor-pointer hover:bg-white/[0.04] transition-all ${note.isPinned ? 'shadow-[0_0_15px_rgba(245,166,35,0.05)]' : ''}">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-base font-bold text-white uppercase tracking-wide truncate max-w-[70%]">${note.title}</h4>
+                                    <div class="flex gap-1 items-center" onclick="event.stopPropagation();">
+                                        <button onclick="togglePinNoteState(${note.id})" class="text-[10px] p-1 ${note.isPinned ? 'text-amber-400' : 'text-gray-600'} hover:text-amber-400"><i class="fa-solid fa-thumbtack"></i></button>
+                                        <span class="text-[9px] font-bold tracking-widest ${textClass} bg-black/40 border border-white/5 px-2 py-0.5 rounded-full uppercase">${note.colorCode.replace('neon','')}</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 whitespace-pre-wrap leading-relaxed mb-4 truncate line-clamp-3">${note.content}</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-white/5" onclick="event.stopPropagation();">
+                                <span class="text-[10px] text-gray-600 font-mono font-bold uppercase">${note.date}</span>
+                                <button onclick="deleteNote(${note.id})" class="text-[10px] text-red-500/60 hover:text-red-400 font-bold uppercase tracking-wider transition-colors">Wipe</button>
+                            </div>
+                        </div>`;
+                });
+            }
+        }
+
+        async function deleteNote(id) {
+            if(await customConfirm("Wipe Note", "Delete this memo permanently?")) {
+                notesData = notesData.filter(n => n.id !== id);
+                saveAll();
+                renderNotes();
+            }
+        }
+
         function showMonthlyStats() {
             document.getElementById('statsModalTitle').innerText = "Monthly Breakdown";
             const stats = {}; const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -957,8 +1377,8 @@
 
         function closeMonthlyStats() { document.getElementById('monthlyStatsModal').classList.add('hidden'); }
         function exportCSV() {
-            let csv = "Date,Time,Name,Amount\n";
-            expensesData.list.forEach(item => csv += `${item.date},${item.time},${item.name},${item.amount}\n`);
+            let csv = "Date,Name,Amount\n";
+            expensesData.list.forEach(item => csv += `"${item.date}","${item.name}",${item.amount}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -975,8 +1395,8 @@
                     let bal = 0;
                     if(p.isGroup) {
                           p.members.forEach(mId => {
-                             const m = peopleData.find(x => x.id === mId);
-                             if(m) m.transactions.forEach(t => { if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) bal += (t.type==='GAVE'?t.amount:-t.amount); });
+                               const m = peopleData.find(x => x.id === mId);
+                               if(m) m.transactions.forEach(t => { if(t.desc && t.desc.startsWith(`(Group: ${p.name})`)) bal += (t.type==='GAVE'?t.amount:-t.amount); });
                           });
                     } else p.transactions.forEach(t => bal += (t.type==='GAVE'?t.amount:-t.amount));
                     let badge = '';
@@ -1038,6 +1458,7 @@
             peopleData.push(personObj); saveAll(); renderPeopleGrid(); cancelAddPerson();
         }
 
+        /* Core Ledger Data Preservation Operations */
         function openEditInterestModal() {
             const p = peopleData.find(x => x.id === activePersonId); if(!p) return;
             document.getElementById('editInterestType').value = p.interestMode; document.getElementById('editInterestRate').value = p.interestRate;
@@ -1110,7 +1531,7 @@
 
             filteredTx.sort((a,b) => b.id - a.id).forEach(t => {
                 const isGave = t.type === 'GAVE';
-                list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 w-auto min-w-[65px]"><p class="text-xs font-black text-white uppercase leading-tight">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div>`;
+                list.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl flex justify-between items-center border border-white/5 animate-slide-up"><div class="flex items-center gap-4"><div class="text-center bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 w-auto min-w-[65px]"><p class="text-xs font-black text-white uppercase leading-tight">${t.date}</p></div><div><p class="text-sm font-bold text-gray-300">${t.desc || (isGave ? 'Sent Cash' : 'Received')}</p><p class="text-[10px] font-bold ${isGave ? 'text-neonBlue' : 'text-red-400'} uppercase">${t.type}</p></div></div><div class="text-right"><p class="text-base font-mono font-bold text-white">₹${formatMoney(t.amount)}</p><div class="flex gap-2 justify-end mt-1"><button onclick="openEditTxModal('ledger', ${t.id})" class="text-[10px] text-neonBlue hover:text-white transition-colors">EDIT</button><span class="text-[10px] text-gray-700">|</span><button onclick="delTx(${t.id})" class="text-[10px] text-gray-600 hover:text-red-500">DEL</button></div></div></div>`;
             });
             if(filteredTx.length === 0) list.innerHTML = `<p class="text-center text-xs text-gray-500 py-6 uppercase tracking-widest">${searchQuery ? 'No Match Found' : 'No Recent Transactions'}</p>`;
         }
@@ -1148,13 +1569,16 @@
             if(!currentUser) return;
             localStorage.setItem('neonFlux_expenses_' + currentUser.id, JSON.stringify(expensesData));
             localStorage.setItem('neonFlux_people_' + currentUser.id, JSON.stringify(peopleData));
+            localStorage.setItem('neonFlux_notes_' + currentUser.id, JSON.stringify(notesData)); 
         }
 
         function loadData() {
             if(!currentUser) return;
-            expensesData = { budget: 0, list: [], lastActiveMonth: '', historyStats: {} }; peopleData = [];
+            expensesData = { budget: 0, list: [], lastActiveMonth: '', historyStats: {} }; peopleData = []; notesData = [];
             const e = localStorage.getItem('neonFlux_expenses_' + currentUser.id); if(e) expensesData = { ...expensesData, ...JSON.parse(e) };
             const p = localStorage.getItem('neonFlux_people_' + currentUser.id); if(p) peopleData = JSON.parse(p);
+            const n = localStorage.getItem('neonFlux_notes_' + currentUser.id); if(n) notesData = JSON.parse(n); 
+            
             if (!peopleData.some(x => x.id === 'myself')) { peopleData.push({ id: 'myself', name: 'Myself', transactions: [], interestMode: 'none', isGroup: false }); saveAll(); }
             const currentMonthName = new Date().toLocaleDateString('en-IN', {month:'short'});
             if (expensesData.lastActiveMonth && expensesData.lastActiveMonth !== currentMonthName) {
@@ -1166,7 +1590,7 @@
             expensesData.lastActiveMonth = currentMonthName; saveAll();
         }
 
-        function formatMoney(amount) { return new Intl.NumberFormat('en-IN').format(Math.round(amount)); }
+        function formatMoney(amount) { return parseFloat(amount).toFixed(2); }
         
         async function logout() { 
             if(await customConfirm("Logout", "Are you sure you want to exit?")) {
