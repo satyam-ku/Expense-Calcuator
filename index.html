@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinCaL | 2026 Financial OS</title>
+    <!-- Google Fonts 2026 Typography (Poppins, Inter, JetBrains Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0c0804',
+                        glass: 'rgba(26, 19, 12, 0.76)',
+                        neonBlue: '#f5a623',
+                        neonPink: '#e8714a',
+                        neonGreen: '#7ec87e',
+                        neonPurple: '#c9956e',
+                        neonRed: '#d94f38',
+                        neonYellow: '#f5c842'
+                    },
+                    animation: {
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen text-base text-amber-100 font-sans selection:bg-amber-600 selection:text-white pb-6 overflow-x-hidden">
+
+    <!-- Global Confirmation Dialog Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-[100] bg-black/85 backdrop-blur-xl flex items-center justify-center p-6">
+        <div class="glass-card-floating w-full max-w-xs p-8 text-center animate-pop-in relative border border-white/20">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 mx-auto flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                <i class="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
+            </div>
+            <h3 class="text-white font-bold text-lg mb-2 uppercase tracking-tight" id="confirm-title">Are you sure?</h3>
+            <p class="text-gray-400 text-xs mb-8 leading-relaxed" id="confirm-message">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button id="confirm-cancel" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
+                <button id="confirm-yes" class="py-3.5 rounded-2xl bg-red-500 text-white font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:scale-[1.02] transition-transform">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication View Shell -->
+    <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#0c0804]">
+        <div class="glass-card-floating w-full max-w-sm p-10 text-center animate-pop-in relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-yellow-200 to-orange-400 opacity-70"></div>
+            <h1 class="text-6xl font-extrabold tracking-tighter mb-2 bg-clip-text text-transparent bg-gradient-to-br from-amber-200 via-yellow-400 to-orange-400">FinCaL</h1>
+            <p class="text-xs uppercase tracking-[0.4em] text-gray-500 mb-10 font-mono">Financial Operating System</p>
+
+            <div id="login-register" class="view-hidden space-y-6">
+                <input type="text" id="regName" placeholder="USERNAME" class="input-glass w-full p-4 uppercase tracking-widest text-sm">
+                <input type="number" id="regPin" inputmode="numeric" placeholder="SET PIN (4)" class="input-glass w-full p-4 font-mono text-2xl tracking-[0.5em]" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+                <button onclick="registerUser()" class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.25)] mt-2 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Initialize Account</button>
+                <button onclick="showLogin()" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest mt-4">Cancel</button>
+            </div>
+
+            <div id="login-auth" class="view-hidden space-y-6">
+                <div class="mb-8">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-950 to-stone-900 border border-amber-500/30 mx-auto flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(245,166,35,0.2)]">
+                        <i class="fa-solid fa-fingerprint text-4xl text-amber-500"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">Select Identity</p>
+                    <select id="userSelect" class="input-glass w-full p-3 text-base font-bold uppercase tracking-wider bg-black"></select>
+                </div>
+                <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glass w-full p-4 font-mono text-3xl tracking-[0.5em] text-amber-400" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+                <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(245,166,35,0.35)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Unlock Dashboard</button>
+                <div class="flex justify-between mt-8 px-2">
+                    <button onclick="showRegister()" class="text-[10px] text-amber-600 hover:text-amber-400 transition-colors uppercase tracking-widest">+ Create Account</button>
+                    <button onclick="resetSystem()" class="text-[10px] text-amber-900 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authenticated App Shell -->
+    <div id="app-view" class="view-hidden touch-pan-y">
+        <header class="app-header">
+            <div class="header-container">
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white">Fin <span class="font-light text-gray-500 italic">CaL</span></h1>
+                    <p class="text-[10px] text-amber-400 font-mono uppercase tracking-widest" id="headerUsername">User</p>
+                </div>
+                <!-- Pill Navigation Bar -->
+                <div class="nav-pill-container">
+                    <a href="#/expenses" id="btn-tab-expenses" class="tab-btn active">Personal</a>
+                    <a href="#/people" id="btn-tab-people" class="tab-btn">People</a>
+                    <a href="#/notes" id="btn-tab-notes" class="tab-btn">Notes</a>
+                </div>
+                <button onclick="logout()" class="text-gray-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 hover:border-amber-400/30"><i class="fa-solid fa-power-off text-sm"></i></button>
+            </div>
+        </header>
+
+        <!-- Dynamic Section Container: Populated from sections/*.html -->
+        <main class="max-w-2xl mx-auto px-4 py-6 relative space-y-8" id="section-container">
+        </main>
+
+        <!-- Route Overlay: Note Dynamic Viewer Sheet (#/notes/:id) -->
+        <div id="noteInlineViewerOverlay" class="hidden fixed inset-0 z-[95] bg-black/92 backdrop-blur-xl flex items-center justify-center p-6 animate-pop-in">
+            <div class="glass-card-floating w-full max-w-md p-6 relative flex flex-col max-h-[85vh]">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                    <span id="noteViewMetaLabel" class="text-[10px] text-gray-400 font-mono uppercase font-bold tracking-widest">Live Document Pipeline</span>
+                    <div class="flex items-center gap-3">
+                        <button id="noteViewPinBtn" class="text-xs text-gray-500 hover:text-amber-400 transition-colors"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button id="noteViewSpeechBtn" class="text-xs text-gray-500 hover:text-emerald-400 transition-colors"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
+                    <input type="text" id="noteViewTitleField" class="w-full bg-transparent border-b border-white/10 text-lg font-bold text-white uppercase tracking-wide py-1 focus:outline-none focus:border-neonBlue placeholder-gray-600" placeholder="NOTE TITLE...">
+                    
+                    <div class="relative w-full">
+                        <textarea id="noteViewContentField" rows="8" oninput="updateNoteCharCount('noteViewContentField', 'noteViewCharCounter')" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-300 leading-relaxed focus:outline-none focus:border-neonBlue focus:bg-white/10 transition-all resize-none custom-scrollbar" placeholder="CONTENT BODY..."></textarea>
+                        <div id="noteViewCharCounter" class="absolute bottom-3 right-3 text-[9px] text-gray-500 font-mono">0 chars</div>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-black/30 p-3 rounded-2xl border border-white/10">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Category Scope:</span>
+                        <select id="noteViewTagSelector" class="bg-white/5 border border-white/10 rounded-xl px-2 py-1 text-xs text-amber-100 uppercase tracking-wider focus:outline-none">
+                            <option value="neonBlue" class="bg-black text-amber-500">Blue/Orange</option>
+                            <option value="neonGreen" class="bg-black text-green-400">Green</option>
+                            <option value="neonPurple" class="bg-black text-amber-700">Purple/Brown</option>
+                            <option value="neonPink" class="bg-black text-orange-500">Pink</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-6 pt-3 border-t border-white/10">
+                    <button onclick="closeNoteViewerOverlay()" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:bg-white/10">Dismiss</button>
+                    <button onclick="commitNoteViewerSave()" class="py-3.5 rounded-2xl bg-amber-500 text-black font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,166,35,0.35)] hover:scale-[1.01] transition-transform">Commit Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Route Overlay: Person Ledger Detail Sheet (#/people/:id) -->
+        <div id="personDetailOverlay" class="fixed inset-0 z-50 bg-[#0c0804] closed flex flex-col h-full w-full overflow-hidden transition-transform duration-300">
+            <div class="p-6 flex items-center justify-between border-b border-white/10">
+                <button onclick="closePersonDetails()" class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+                <div class="text-center">
+                    <h2 class="text-base font-bold text-white tracking-widest uppercase" id="detailPersonName">Name</h2>
+                    <p class="text-[11px] text-gray-500 uppercase tracking-widest">Ledger Details</p>
+                </div>
+                <button onclick="deleteCurrentPerson()" class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 hover:bg-red-500/20"><i class="fa-solid fa-trash text-lg"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center space-y-8">
+                <div class="glass-card-floating p-10 rounded-full w-72 h-72 flex flex-col items-center justify-center relative border border-white/10 mt-6 shrink-0">
+                    <div class="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
+                    <div class="absolute w-40 h-40 bg-amber-500 blur-[80px] opacity-15" id="detailGlow"></div>
+                    <p class="text-gray-400 text-xs uppercase tracking-[0.3em] mb-3 relative z-10 font-mono">Net Standing</p>
+                    <div class="text-5xl font-mono font-bold text-white mb-2 relative z-10 tracking-tighter" id="detailBalance">₹0.00</div>
+                    <div class="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 relative z-10 flex flex-col items-center gap-1 min-w-[120px]">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" id="detailStatus">Settled</p>
+                    </div>
+                </div>
+
+                <div id="detailedInterestCard" class="hidden w-full max-w-sm glass-card-floating p-5 relative group"></div>
+
+                <div id="detailedGroupMembers" class="hidden w-full max-w-sm">
+                    <h4 class="text-[10px] uppercase tracking-widest text-gray-500 mb-3 ml-2">Group Members</h4>
+                    <div id="groupMembersDisplay" class="space-y-2"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5 w-full max-w-sm shrink-0">
+                    <button onclick="openTransactionModal('GAVE')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#0e0707] border border-amber-500/20 text-center transition-transform active:scale-95 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                        <div class="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors"></div>
+                        <i class="fa-solid fa-arrow-up text-amber-400 text-2xl mb-3"></i>
+                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Gave</p>
+                        <p class="text-[10px] text-amber-400/70 mt-1 font-mono">THEY OWE YOU</p>
+                    </button>
+                    <button onclick="openTransactionModal('GOT')" class="group relative overflow-hidden p-6 rounded-3xl bg-[#070e0e] border border-red-500/20 text-center transition-transform active:scale-95 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                        <div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
+                        <i class="fa-solid fa-arrow-down text-red-500 text-2xl mb-3"></i>
+                        <p class="text-sm font-bold text-gray-300 uppercase tracking-widest group-hover:text-white">I Got</p>
+                        <p class="text-[10px] text-red-500/70 mt-1 font-mono">REPAYMENT</p>
+                    </button>
+                </div>
+
+                <div class="w-full max-w-md pb-12 shrink-0">
+                    <div class="flex flex-col gap-4 px-2 mb-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs text-gray-400 font-bold uppercase tracking-widest">Transaction Log</h3>
+                            <div class="flex gap-2">
+                                <button onclick="showPersonMonthlyStats()" class="text-[9px] text-neonPurple/70 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-chart-pie mr-1"></i> Month</button>
+                                <button onclick="showPersonHistory()" class="text-[9px] text-neonGreen/70 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Hist</button>
+                                <button onclick="exportPersonCSV()" class="text-[9px] text-neonBlue/70 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-download mr-1"></i> Exp</button>
+                                <button onclick="clearPersonHistory()" class="text-[9px] text-red-500/70 hover:text-red-400 uppercase tracking-widest border border-red-500/30 px-2.5 py-1 rounded-lg">Clear</button>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 w-full">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-[10px]"></i>
+                                <input type="text" id="personTxSearch" oninput="filterPersonTransactions()" placeholder="SEARCH LOG..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-9 pr-4 text-[10px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-neonBlue transition-all">
+                            </div>
+                            <select id="selectPersonTxSort" onchange="changePersonTxSortOrder(this.value)" class="px-2.5 py-2.5 rounded-2xl bg-black border border-white/10 text-[10px] text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
+                                <option value="date-desc" class="bg-black">Newest</option>
+                                <option value="date-asc" class="bg-black">Oldest</option>
+                                <option value="amount-desc" class="bg-black">Price High-Low</option>
+                                <option value="amount-asc" class="bg-black">Price Low-High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="personHistoryList" class="space-y-4"></div>
+                </div>
+            </div>
+            
+            <div id="txInputModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+                <div class="glass-card-floating w-full max-w-xs p-8 text-center animate-pop-in relative">
+                    <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white" id="txModalType">Record</h3>
+                    <div class="space-y-5">
+                        <input type="text" id="txDesc" placeholder="Description (e.g. Lunch)" class="input-glass w-full p-4 text-base">
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                            <input type="number" id="txAmt" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-3">
+                            <button onclick="closeTxModal()" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                            <button onclick="submitPersonTx()" class="py-3.5 rounded-2xl bg-white text-black font-bold text-xs shadow-[0_0_20px_rgba(255,255,255,0.25)]">CONFIRM</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Interest Modal -->
+        <div id="editInterestModal" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-sm p-6 animate-pop-in relative">
+                <h3 class="text-sm font-bold mb-6 uppercase tracking-widest text-center text-white">Edit Interest Details</h3>
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="editInterestType" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="simple" class="bg-black">Simple Int.</option>
+                            <option value="compound" class="bg-black">Compound Int.</option>
+                        </select>
+                        <div class="relative">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs">% Rate</span>
+                            <input type="number" id="editInterestRate" placeholder="Rate" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex gap-1">
+                            <input type="number" id="editInterestTime" placeholder="Duration" class="bg-white/5 border border-white/10 rounded-l-2xl px-4 h-12 text-white text-base focus:outline-none w-full">
+                            <select id="editInterestTimeUnit" class="bg-white/5 border border-white/10 border-l-0 rounded-r-2xl px-2 h-12 text-white text-xs uppercase focus:outline-none w-20">
+                                <option value="years" class="bg-black">Yrs</option>
+                                <option value="months" class="bg-black">Mos</option>
+                            </select>
+                        </div>
+                        <select id="editInterestFreq" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="monthly" class="bg-black">Monthly</option>
+                            <option value="quarterly" class="bg-black">Quarterly</option>
+                            <option value="half-yearly" class="bg-black">Half Yearly</option>
+                            <option value="yearly" class="bg-black">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="closeEditInterestModal()" class="h-12 flex-1 rounded-2xl border border-white/10 text-gray-500 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
+                        <button onclick="updateInterestDetails()" class="h-12 flex-1 bg-neonPurple rounded-2xl text-white font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(191,0,255,0.35)] hover:scale-[1.02] transition-transform">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Expense Modal -->
+        <div id="editTxModal" class="hidden fixed inset-0 z-[80] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-xs p-8 text-center animate-pop-in relative">
+                <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white">Edit Record</h3>
+                <div class="space-y-5">
+                    <input type="text" id="editTxNameDesc" placeholder="Name / Description" class="input-glass w-full p-4 text-base">
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <input type="number" id="editTxAmount" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-3">
+                        <button onclick="closeEditTxModal()" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                        <button onclick="submitEditedTx()" class="py-3.5 rounded-2xl bg-amber-500 text-black font-bold text-xs shadow-[0_0_20px_rgba(245,166,35,0.35)]">UPDATE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Past Expense Modal -->
+        <div id="addPastExpenseModal" class="hidden fixed inset-0 z-[85] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-xs p-8 text-center animate-pop-in relative">
+                <h3 class="text-base font-bold mb-1 uppercase tracking-widest text-white">Add Past Expense</h3>
+                <p id="pastTargetMonthLabel" class="text-xs text-neonBlue uppercase tracking-widest mb-6 font-bold font-mono">Month</p>
+                <div class="space-y-5">
+                    <input type="text" id="pastExpenseName" placeholder="Expense Name..." class="input-glass w-full p-4 text-base">
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <input type="number" id="pastExpenseAmount" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/5 p-2 rounded-2xl border border-white/10">
+                        <span class="text-xs text-gray-400 font-mono font-bold uppercase tracking-wider pl-2">Date:</span>
+                        <select id="pastExpenseDay" class="input-glass flex-1 p-2 text-sm font-mono font-bold bg-black text-amber-400">
+                            <!-- Options 1 to 31 populated in expenses.js -->
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-3">
+                        <button onclick="closePastExpenseModal()" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10">CANCEL</button>
+                        <button onclick="submitPastExpenseTx()" class="py-3.5 rounded-2xl bg-neonGreen text-black font-bold text-xs shadow-[0_0_20px_rgba(0,255,157,0.35)]">ADD DATA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Breakdown Modal -->
+        <div id="monthlyStatsModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-sm p-8 animate-pop-in relative flex flex-col max-h-[82vh]">
+                <h3 id="statsModalTitle" class="text-base font-bold mb-6 uppercase tracking-widest text-center text-neonPurple">Breakdown</h3>
+                <div id="monthlyStatsList" class="overflow-y-auto flex-1 space-y-4 pr-1 custom-scrollbar"></div>
+                <button onclick="closeMonthlyStats()" class="mt-6 py-4 w-full rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition">CLOSE</button>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div id="historyModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-md p-6 animate-pop-in relative flex flex-col max-h-[85vh]">
+                <h3 id="historyModalTitle" class="text-base font-bold mb-6 uppercase tracking-widest text-center text-neonGreen">History</h3>
+                <div id="historyListContainer" class="overflow-y-auto flex-1 space-y-3 pr-1 custom-scrollbar"></div>
+                <button onclick="closeHistory()" class="mt-6 py-4 w-full rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition">CLOSE</button>
+            </div>
+        </div>
+
+        <!-- Manual Modal -->
+        <div id="manualModal" class="hidden fixed inset-0 z-[90] bg-black/95 backdrop-blur-lg flex items-center justify-center p-6">
+            <div class="glass-card-floating w-full max-w-md p-6 animate-pop-in relative flex flex-col max-h-[85vh]">
+                <h3 class="text-lg font-extrabold mb-6 uppercase tracking-widest text-center text-white">How It Works</h3>
+                <div class="overflow-y-auto flex-1 space-y-5 pr-1 custom-scrollbar">
+                    
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonBlue/30">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-user-plus text-neonBlue text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonBlue uppercase tracking-widest">Normal</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Personal debt tracker. 
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Money you record as <span class="text-neonBlue">"I GAVE"</span> here is automatically deducted from your <span class="text-white">Personal Budget</span> in the Expenses tab. Use this for lending money to friends.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonYellow/30">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-clipboard-list text-neonYellow text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonYellow uppercase tracking-widest">General</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Isolated record keeping.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Transactions here do <span class="text-red-400">NOT</span> affect your Personal Budget. Use this for business records or tracking money that doesn't come out of your daily pocket.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonPurple/30">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-percent text-neonPurple text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonPurple uppercase tracking-widest">Interest</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Investment tracker.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> Automatically calculates repayment amount based on:
+                            <ul class="list-disc ml-4 mt-1 text-gray-400">
+                                <li>Principal Amount</li>
+                                <li>Rate %</li>
+                                <li>Duration & Frequency</li>
+                                <li>Type (Simple vs Compound)</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-2xl border border-neonGreen/30">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-users-viewfinder text-neonGreen text-lg"></i>
+                            <h4 class="text-sm font-bold text-neonGreen uppercase tracking-widest">Group</h4>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Split-wise logic.
+                            <br><br>
+                            <span class="text-white font-bold">Key Feature:</span> You select members from your existing "Normal" list. Any transaction added to the Group is <span class="text-neonGreen">divided equally</span> and added to each member's individual ledger.
+                        </p>
+                    </div>
+
+                </div>
+                <button onclick="closeManual()" class="mt-6 py-4 w-full rounded-2xl bg-white text-black font-bold text-xs shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:scale-[1.02] transition">GOT IT</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Imports -->
+    <script src="store.js"></script>
+    <script src="auth.js"></script>
+    <script src="expenses.js"></script>
+    <script src="people.js"></script>
+    <script src="notes.js"></script>
+    <script src="router.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

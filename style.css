@@ -1,0 +1,365 @@
+/* ==========================================================================
+   FinCaL 2026 Modern FinTech Design System (Dark Glassmorphism)
+   Glassmorphism | Soft Neumorphism | Apple & Linear Aesthetic
+   ========================================================================== */
+
+/* 1. CSS Custom Properties & Pastel Palette */
+:root {
+    --bg-main: #0c0804;
+    --bg-surface: rgba(22, 16, 10, 0.72);
+    --panel-glass: rgba(26, 19, 12, 0.76);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --panel-border-glow: rgba(245, 166, 35, 0.35);
+    
+    --shadow-ambient: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    --shadow-floating: 0 30px 60px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+    --shadow-glow-amber: 0 0 25px rgba(245, 166, 35, 0.25);
+    
+    /* 2026 Curated Pastel Palette */
+    --pastel-blue: #60a5fa;
+    --pastel-pink: #f472b6;
+    --pastel-orange: #fb923c;
+    --pastel-yellow: #facc15;
+    --pastel-purple: #c084fc;
+    --mint-green: #4ade80;
+    --soft-cyan: #38bdf8;
+    --neon-amber: #f5a623;
+    
+    --color-text-main: #fef3c7;
+    --color-text-body: #d1d5db;
+    --color-text-muted: #9ca3af;
+    
+    --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* 2. Global Resets & Body */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(245, 166, 35, 0.12), transparent 40%),
+        radial-gradient(circle at 90% 15%, rgba(244, 114, 182, 0.09), transparent 35%),
+        radial-gradient(circle at 50% 85%, rgba(96, 165, 250, 0.08), transparent 45%);
+    background-attachment: fixed;
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+}
+
+/* 3. Typography Rules */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.font-mono, input[type="number"], .font-money, .amount-display {
+    font-family: var(--font-mono) !important;
+}
+
+/* 4. Glassmorphism Panels & Floating Cards */
+.glass-panel, .glass-card {
+    background: var(--panel-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--shadow-ambient);
+    border-radius: 28px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+
+.glass-card-floating {
+    background: var(--panel-glass);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: var(--shadow-floating);
+    border-radius: 32px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-floating:hover {
+    transform: translateY(-4px);
+    border-color: var(--panel-border-glow);
+    box-shadow: var(--shadow-floating), var(--shadow-glow-amber);
+}
+
+/* 5. Inset Soft Neumorphic Inputs & Controls */
+.input-glow, .input-glass {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fef3c7;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 16px; 
+    text-align: center;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.input-glow:focus, .input-glass:focus {
+    outline: none;
+    border-color: var(--neon-amber);
+    background: rgba(24, 16, 8, 0.9);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 166, 35, 0.25);
+    transform: translateY(-2px);
+}
+
+select.input-glow, select.input-glass {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5a623'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5em;
+}
+
+.view-hidden {
+    display: none !important;
+}
+
+/* 6. Header & Pill Navigation Bar */
+.app-header {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background-color: rgba(12, 8, 4, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-pill-container {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.25rem;
+    border-radius: 9999px;
+}
+
+.tab-btn { 
+    opacity: 0.65; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    position: relative; 
+    padding: 0.5rem 1.25rem;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--color-text-body);
+    text-decoration: none;
+    border-radius: 9999px;
+}
+
+.tab-btn.active { 
+    opacity: 1; 
+    color: #110c06; 
+    background: var(--neon-amber);
+    box-shadow: 0 0 18px rgba(245, 166, 35, 0.45);
+}
+
+.tab-btn.active::after {
+    display: none;
+}
+
+/* 7. 3D Doughnut Chart & Slice-Style Analytics Components */
+.doughnut-3d-wrapper {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    margin: 1.25rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 800px;
+}
+
+.doughnut-3d-ring {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 25px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(245, 166, 35, 0.2);
+    transition: transform 0.5s ease;
+    transform: rotateX(18deg) rotateY(6deg);
+}
+
+.doughnut-3d-center {
+    position: absolute;
+    inset: 24px;
+    background: #140d07;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6);
+    z-index: 10;
+}
+
+/* Slice App Style Category Percentage Cards */
+.slice-bars-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.slice-bar-card {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.slice-bar-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(245, 166, 35, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+}
+
+.slice-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.slice-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.slice-bar-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.slice-bar-title {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fef3c7;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.slice-bar-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-family: var(--font-mono);
+}
+
+.slice-bar-amount {
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: #ffffff;
+}
+
+.slice-bar-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 0.4rem;
+}
+
+.slice-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+/* 8. Overlays & Modals */
+#personDetailOverlay.open { transform: translateY(0); }
+#personDetailOverlay.closed { transform: translateY(100%); }
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background-color: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+/* 9. Keyframes & Animations */
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.94); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+/* 10. Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--neon-amber); border-radius: 4px; }
+
+/* 11. Pastel Utility Classes */
+.text-pastel-blue { color: var(--pastel-blue); }
+.text-pastel-pink { color: var(--pastel-pink); }
+.text-pastel-orange { color: var(--pastel-orange); }
+.text-pastel-yellow { color: var(--pastel-yellow); }
+.text-pastel-purple { color: var(--pastel-purple); }
+.text-mint-green { color: var(--mint-green); }
+.text-soft-cyan { color: var(--soft-cyan); }
+.text-neon-amber { color: var(--neon-amber); }

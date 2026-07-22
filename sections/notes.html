@@ -1,0 +1,165 @@
+<div id="tab-notes-content" class="animate-pop-in flex flex-col gap-6 relative">
+    
+    <!-- Category & Folder Navigation Pill Bar -->
+    <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between px-2">
+            <h2 id="notesViewHeading" class="text-sm font-bold text-[#fef3c7] uppercase tracking-widest font-mono">All Notes</h2>
+            <div class="flex items-center gap-2">
+                <button onclick="openCustomCategoryModal()" class="text-[10px] text-amber-400 font-bold uppercase tracking-wider bg-white/5 border border-amber-400/30 px-2.5 py-1.5 rounded-xl hover:bg-amber-400/10 flex items-center gap-1 transition">
+                    <i class="fa-solid fa-folder-plus"></i> + Category
+                </button>
+                <button onclick="openNotesSettingsModal()" class="text-[10px] text-gray-400 hover:text-white uppercase tracking-wider bg-white/5 border border-white/10 p-1.5 rounded-xl hover:bg-white/10 transition">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Pills Scrollable Container -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 px-1 custom-scrollbar select-none" id="notesCategoryPillsContainer">
+            <!-- Dynamically populated via notes.js renderCategoryPills() -->
+        </div>
+    </div>
+
+    <!-- Search, View Toggle, and Sort Bar -->
+    <div class="flex flex-col md:flex-row gap-3 px-1">
+        <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+            <input type="text" id="noteSearch" oninput="renderNotes()" placeholder="SEARCH NOTES BY TITLE, CONTENT, OR CATEGORY..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-neonBlue transition-all">
+        </div>
+        <div class="flex gap-2 shrink-0">
+            <!-- Grid vs List Toggle -->
+            <button onclick="toggleNotesViewMode()" id="btnToggleViewMode" class="px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-gray-300 font-bold uppercase tracking-wider hover:bg-white/10 flex items-center gap-2 transition">
+                <i class="fa-solid fa-table-cells" id="iconViewMode"></i>
+                <span id="labelViewMode">Grid</span>
+            </button>
+            <!-- Sort Selector -->
+            <select id="selectNotesSort" onchange="changeNotesSortOrder(this.value)" class="px-3 py-2.5 rounded-2xl bg-black border border-white/10 text-xs text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
+                <option value="date-desc" class="bg-black">Newest First</option>
+                <option value="date-asc" class="bg-black">Oldest First</option>
+                <option value="title" class="bg-black">Alphabetical</option>
+                <option value="category" class="bg-black">By Category</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Trash Bin Header Action Banner (Visible when viewing Trash) -->
+    <div id="trashBanner" class="hidden glass-card-floating p-4 flex items-center justify-between border-red-500/30 bg-red-950/20">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-trash-can text-red-400 text-lg"></i>
+            <div>
+                <p class="text-xs font-bold text-white uppercase tracking-wider">Trash Bin</p>
+                <p class="text-[10px] text-gray-400">Items in trash can be restored or permanently deleted.</p>
+            </div>
+        </div>
+        <button onclick="emptyTrashBin()" class="text-[10px] bg-red-500/20 border border-red-500/40 text-red-300 px-3 py-1.5 rounded-xl font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition">Empty Trash</button>
+    </div>
+
+    <!-- Main Notes Container (Grid or List layout dynamically updated) -->
+    <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[250px]"></div>
+
+    <!-- Empty State -->
+    <div id="notesEmptyState" class="hidden py-20 text-center">
+        <div class="w-20 h-20 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-4 border border-white/5">
+            <i class="fa-solid fa-note-sticky text-3xl text-gray-600" id="emptyStateIcon"></i>
+        </div>
+        <p id="emptyStateText" class="text-xs text-gray-500 font-mono uppercase tracking-widest">No Notes Found</p>
+    </div>
+
+    <!-- Floating Add Button (FAB) -->
+    <button onclick="openCreateNoteModal()" title="Create New Note" class="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black flex items-center justify-center text-2xl shadow-[0_10px_30px_rgba(245,166,35,0.4)] hover:scale-110 active:scale-95 transition-all">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- Create / Edit Note Modal Overlay -->
+    <div id="createEditNoteModal" class="hidden fixed inset-0 z-[85] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 animate-pop-in">
+        <div class="glass-card-floating w-full max-w-md p-6 relative flex flex-col max-h-[85vh]">
+            <h3 id="noteModalHeaderTitle" class="text-sm font-bold text-amber-400 uppercase tracking-widest mb-4 font-mono">Create Note</h3>
+            
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
+                <input type="text" id="noteModalTitle" placeholder="NOTE TITLE..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-base text-white focus:outline-none focus:border-neonBlue transition-all">
+                
+                <div class="relative w-full">
+                    <textarea id="noteModalContent" rows="6" oninput="updateNoteCharCount('noteModalContent', 'noteModalCharCounter')" placeholder="WRITE NOTE CONTENT..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 leading-relaxed focus:outline-none focus:border-neonBlue transition-all resize-none custom-scrollbar"></textarea>
+                    <div id="noteModalCharCounter" class="absolute bottom-3 right-3 text-[9px] text-gray-500 font-mono">0 chars</div>
+                </div>
+
+                <!-- Category Selector & Custom Input Option -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider font-mono mb-1">Category</label>
+                        <select id="noteModalCategory" class="w-full bg-black border border-white/10 rounded-xl p-3 text-xs text-amber-100 uppercase tracking-wider focus:outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider font-mono mb-1">Color Theme</label>
+                        <select id="noteModalColor" class="w-full bg-black border border-white/10 rounded-xl p-3 text-xs text-amber-100 uppercase tracking-wider focus:outline-none">
+                            <option value="neonBlue" class="bg-black text-amber-500">Blue/Amber</option>
+                            <option value="neonGreen" class="bg-black text-green-400">Mint Green</option>
+                            <option value="neonPurple" class="bg-black text-amber-700">Purple</option>
+                            <option value="neonPink" class="bg-black text-orange-500">Pink</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Pin & Favorite Checks -->
+                <div class="flex items-center gap-6 pt-2">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="noteModalPinned" class="accent-amber-500 w-4 h-4 rounded">
+                        <span class="text-xs text-gray-300 uppercase tracking-wider font-mono"><i class="fa-solid fa-thumbtack text-amber-400 mr-1"></i> Pin Note</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="noteModalFavorite" class="accent-amber-500 w-4 h-4 rounded">
+                        <span class="text-xs text-gray-300 uppercase tracking-wider font-mono"><i class="fa-solid fa-star text-yellow-400 mr-1"></i> Favorite</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-6 pt-3 border-t border-white/10">
+                <button onclick="closeCreateEditNoteModal()" class="py-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:bg-white/10">Cancel</button>
+                <button onclick="submitSaveNoteModal()" class="py-3.5 rounded-2xl bg-amber-500 text-black font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(245,166,35,0.35)] hover:scale-[1.01] transition-transform">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Custom Category Modal -->
+    <div id="addCustomCategoryModal" class="hidden fixed inset-0 z-[90] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 animate-pop-in">
+        <div class="glass-card-floating w-full max-w-xs p-6 relative text-center">
+            <h3 class="text-sm font-bold text-amber-400 uppercase tracking-widest mb-4 font-mono">Add Custom Category</h3>
+            <input type="text" id="customCategoryInput" placeholder="CATEGORY NAME (E.G. WORK)..." class="input-glass w-full p-4 text-xs uppercase tracking-widest mb-4">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeCustomCategoryModal()" class="py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-wider">Cancel</button>
+                <button onclick="submitCustomCategory()" class="py-3 rounded-xl bg-amber-500 text-black text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(245,166,35,0.3)]">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Settings Modal -->
+    <div id="notesSettingsModal" class="hidden fixed inset-0 z-[90] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 animate-pop-in">
+        <div class="glass-card-floating w-full max-w-sm p-6 relative flex flex-col max-h-[85vh]">
+            <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-4 font-mono text-center">Notes Settings</h3>
+            
+            <div class="space-y-4 overflow-y-auto pr-1 custom-scrollbar">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
+                    <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Data Management</h4>
+                    <button onclick="exportNotesJSON()" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-white/10 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Export All Notes (JSON)
+                    </button>
+                    <button onclick="exportNotesTXT()" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-white/10 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-lines"></i> Export All Notes (Text)
+                    </button>
+                </div>
+
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
+                    <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider">Danger Zone</h4>
+                    <button onclick="emptyTrashBin()" class="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> Empty Trash Bin
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="closeNotesSettingsModal()" class="mt-6 py-3.5 w-full rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs hover:bg-white/10 hover:text-white transition uppercase tracking-widest">Close Settings</button>
+        </div>
+    </div>
+
+</div>

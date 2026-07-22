@@ -1,0 +1,99 @@
+<div id="tab-people-content" class="animate-pop-in flex flex-col gap-6">
+    
+    <!-- How Ledger Categories Work Button -->
+    <button onclick="openManual()" class="w-full py-3.5 rounded-2xl bg-white/5 border border-neonYellow/40 text-neonYellow font-bold text-xs uppercase tracking-[0.2em] hover:bg-neonYellow/10 transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(243,255,0,0.15)]">
+        <i class="fa-solid fa-circle-question text-base"></i>
+        <span>How Ledger Categories Work</span>
+    </button>
+
+    <!-- Total Owed Summary Glass Card -->
+    <div class="glass-card-floating p-6 relative overflow-hidden mb-2">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neonBlue/60 via-amber-300 to-transparent"></div>
+        <div class="flex justify-between items-end relative z-10">
+            <div>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-mono mb-1">Total Owed To Me (Normal)</p>
+                <h2 class="text-3xl font-mono font-bold text-white">₹<span id="displayNormalReceivable">0.00</span></h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-neonBlue/10 flex items-center justify-center border border-neonBlue/30 text-neonBlue shadow-[0_0_15px_rgba(245,166,35,0.2)]">
+                <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ledger Category Action Pill Buttons Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button onclick="openAddPersonMode('normal')" class="glass-card-floating p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/10 transition border-neonBlue/30">
+            <i class="fa-solid fa-user-plus text-neonBlue text-xl"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Normal</span>
+        </button>
+        <button onclick="openAddPersonMode('general')" class="glass-card-floating p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/10 transition border-neonYellow/30">
+            <i class="fa-solid fa-clipboard-list text-neonYellow text-xl"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest">General</span>
+        </button>
+        <button onclick="openAddPersonMode('interest')" class="glass-card-floating p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/10 transition border-neonPurple/30">
+            <i class="fa-solid fa-percent text-neonPurple text-xl"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Interest</span>
+        </button>
+        <button onclick="openAddPersonMode('group')" class="glass-card-floating p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/10 transition border-neonGreen/30">
+            <i class="fa-solid fa-users-viewfinder text-neonGreen text-xl"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest">Group</span>
+        </button>
+    </div>
+
+    <!-- Add Person Form Container -->
+    <div id="addPersonContainer" class="hidden glass-card-floating p-1 animate-slide-up">
+       <div class="bg-black/30 rounded-[28px] p-5">
+            <h3 id="addPersonTitle" class="text-xs text-gray-400 font-mono uppercase tracking-widest mb-3 ml-2">Adding Person</h3>
+            <div class="flex flex-col gap-3">
+                <input type="text" id="newPersonName" placeholder="Name or Group Title..." class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-base focus:outline-none focus:border-neonBlue w-full">
+                
+                <div id="interestOptions" class="hidden flex flex-col gap-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="interestType" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="simple" class="bg-black">Simple Int.</option>
+                            <option value="compound" class="bg-black">Compound Int.</option>
+                        </select>
+                        <div class="relative">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-mono">% Rate</span>
+                            <input type="number" id="interestRate" placeholder="Rate" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-base focus:outline-none w-full font-mono">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex gap-1">
+                            <input type="number" id="interestTime" placeholder="Duration" class="bg-white/5 border border-white/10 rounded-l-2xl px-4 h-12 text-white text-base focus:outline-none w-full font-mono">
+                            <select id="interestTimeUnit" class="bg-white/5 border border-white/10 border-l-0 rounded-r-2xl px-2 h-12 text-white text-xs uppercase focus:outline-none w-20">
+                                <option value="years" class="bg-black">Yrs</option>
+                                <option value="months" class="bg-black">Mon</option>
+                            </select>
+                        </div>
+                        <select id="interestFreq" class="bg-white/5 border border-white/10 rounded-2xl px-4 h-12 text-white text-xs uppercase tracking-widest focus:outline-none">
+                            <option value="monthly" class="bg-black">Monthly</option>
+                            <option value="quarterly" class="bg-black">Quarterly</option>
+                            <option value="half-yearly" class="bg-black">Half Yearly</option>
+                            <option value="yearly" class="bg-black">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="groupOptions" class="hidden">
+                    <p class="text-[10px] text-gray-400 font-mono uppercase tracking-widest mb-2 ml-1">Select Members</p>
+                    <div id="groupMemberList" class="max-h-32 overflow-y-auto space-y-2 p-2 bg-white/5 rounded-2xl border border-white/10 custom-scrollbar"></div>
+                </div>
+
+                <div class="flex gap-2 mt-1">
+                    <button onclick="cancelAddPerson()" class="h-12 flex-1 rounded-2xl border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-widest hover:bg-white/5">Cancel</button>
+                    <button onclick="confirmAddPerson()" class="h-12 flex-1 bg-amber-500 rounded-2xl text-black font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(245,166,35,0.35)] hover:bg-amber-400">Save</button>
+                </div>
+            </div>
+       </div>
+    </div>
+
+    <!-- People Grid -->
+    <div id="peopleGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <div id="peopleEmptyState" class="hidden py-24 text-center">
+        <div class="w-24 h-24 rounded-full bg-white/5 mx-auto flex items-center justify-center mb-5 border border-white/5">
+            <i class="fa-solid fa-users text-3xl text-gray-700"></i>
+        </div>
+        <p class="text-sm text-gray-500 font-mono uppercase tracking-widest">No Active Ledgers</p>
+    </div>
+</div>
