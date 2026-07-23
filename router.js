@@ -22,6 +22,9 @@ async function loadSectionHTML(sectionName) {
     if (sectionCache[sectionName]) {
         container.innerHTML = sectionCache[sectionName];
     }
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
 }
 
 function updateActiveTabButtons(tab) {
@@ -116,6 +119,9 @@ async function handleRoute() {
         renderExpenses();
     } else {
         window.location.hash = '#/expenses';
+    }
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
     }
 }
 

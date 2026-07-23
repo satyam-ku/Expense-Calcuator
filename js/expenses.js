@@ -292,6 +292,9 @@ function renderExpenses() {
             if (showMoreContainer) showMoreContainer.classList.add('hidden');
         }
     }
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
 }
 
 // 2. Category Aggregation Logic
@@ -447,7 +450,7 @@ function renderAnalyticsModalContent() {
             historyHtml += `
             <div class="bg-white/5 p-5 rounded-xl border ${isCurrent ? 'border-neonBlue/30' : 'border-white/5'} relative">
                 <button onclick="closeMonthlyStats(); openPastExpenseModal('${d.month}')" class="absolute top-4 right-4 text-[10px] text-neonGreen font-bold uppercase tracking-wider bg-white/5 border border-neonGreen/20 px-2.5 py-1 rounded hover:bg-neonGreen/10 flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i> Add
+                    <i data-lucide="plus" class="w-3 h-3"></i> Add
                 </button>
                 <div class="flex justify-between items-center mb-3">
                     <span class="text-lg font-bold text-white uppercase tracking-widest">${d.month} ${isCurrent ? '<span class="text-[9px] bg-neonBlue text-black px-1.5 py-0.5 rounded ml-2">LIVE</span>' : ''}</span>

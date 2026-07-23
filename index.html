@@ -11,6 +11,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -94,11 +95,11 @@
                 </div>
                 <!-- Pill Navigation Bar -->
                 <div class="nav-pill-container">
-                    <a href="#/expenses" id="btn-tab-expenses" class="tab-btn active">Personal</a>
-                    <a href="#/people" id="btn-tab-people" class="tab-btn">People</a>
-                    <a href="#/notes" id="btn-tab-notes" class="tab-btn">Notes</a>
+                    <a href="#/expenses" id="btn-tab-expenses" class="tab-btn active flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i>Personal</a>
+                    <a href="#/people" id="btn-tab-people" class="tab-btn flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i>People</a>
+                    <a href="#/notes" id="btn-tab-notes" class="tab-btn flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i>Notes</a>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 hover:border-amber-400/30"><i class="fa-solid fa-power-off text-sm"></i></button>
+                <button onclick="logout()" title="Logout" class="text-gray-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 hover:border-amber-400/30"><i data-lucide="power" class="w-4 h-4"></i></button>
             </div>
         </header>
 
@@ -192,23 +193,26 @@
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs text-gray-400 font-bold uppercase tracking-widest">Transaction Log</h3>
                             <div class="flex gap-2">
-                                <button onclick="showPersonMonthlyStats()" class="text-[9px] text-neonPurple/70 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-chart-pie mr-1"></i> Month</button>
-                                <button onclick="showPersonHistory()" class="text-[9px] text-neonGreen/70 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Hist</button>
-                                <button onclick="exportPersonCSV()" class="text-[9px] text-neonBlue/70 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/30 px-2.5 py-1 rounded-lg"><i class="fa-solid fa-download mr-1"></i> Exp</button>
-                                <button onclick="clearPersonHistory()" class="text-[9px] text-red-500/70 hover:text-red-400 uppercase tracking-widest border border-red-500/30 px-2.5 py-1 rounded-lg">Clear</button>
+                                <button onclick="showPersonMonthlyStats()" class="text-[9px] text-neonPurple/70 hover:text-neonPurple uppercase tracking-widest border border-neonPurple/30 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="pie-chart" class="w-3 h-3"></i> Month</button>
+                                <button onclick="showPersonHistory()" class="text-[9px] text-neonGreen/70 hover:text-neonGreen uppercase tracking-widest border border-neonGreen/30 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="history" class="w-3 h-3"></i> Hist</button>
+                                <button onclick="exportPersonCSV()" class="text-[9px] text-neonBlue/70 hover:text-neonBlue uppercase tracking-widest border border-neonBlue/30 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="download" class="w-3 h-3"></i> Exp</button>
+                                <button onclick="clearPersonHistory()" class="text-[9px] text-red-500/70 hover:text-red-400 uppercase tracking-widest border border-red-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Clear</button>
                             </div>
                         </div>
                         <div class="flex gap-2 w-full">
-                            <div class="relative flex-1">
-                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-[10px]"></i>
+                            <div class="relative flex-1 flex items-center">
+                                <i data-lucide="search" class="w-3 h-3 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
                                 <input type="text" id="personTxSearch" oninput="filterPersonTransactions()" placeholder="SEARCH LOG..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-9 pr-4 text-[10px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-neonBlue transition-all">
                             </div>
-                            <select id="selectPersonTxSort" onchange="changePersonTxSortOrder(this.value)" class="px-2.5 py-2.5 rounded-2xl bg-black border border-white/10 text-[10px] text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
-                                <option value="date-desc" class="bg-black">Newest</option>
-                                <option value="date-asc" class="bg-black">Oldest</option>
-                                <option value="amount-desc" class="bg-black">Price High-Low</option>
-                                <option value="amount-asc" class="bg-black">Price Low-High</option>
-                            </select>
+                            <div class="relative flex items-center">
+                                <i data-lucide="arrow-down-up" class="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none"></i>
+                                <select id="selectPersonTxSort" onchange="changePersonTxSortOrder(this.value)" class="pl-8 pr-2.5 py-2.5 rounded-2xl bg-black border border-white/10 text-[10px] text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
+                                    <option value="date-desc" class="bg-black">Newest</option>
+                                    <option value="date-asc" class="bg-black">Oldest</option>
+                                    <option value="amount-desc" class="bg-black">Price High-Low</option>
+                                    <option value="amount-asc" class="bg-black">Price Low-High</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div id="personHistoryList" class="space-y-4"></div>
@@ -220,8 +224,8 @@
                     <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white" id="txModalType">Record</h3>
                     <div class="space-y-5">
                         <input type="text" id="txDesc" placeholder="Description (e.g. Lunch)" class="input-glass w-full p-4 text-base">
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                        <div class="relative flex items-center">
+                            <i data-lucide="indian-rupee" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
                             <input type="number" id="txAmt" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
                         </div>
                         <div class="grid grid-cols-2 gap-3 pt-3">
@@ -277,8 +281,8 @@
                 <h3 class="text-base font-bold mb-6 uppercase tracking-widest text-white">Edit Record</h3>
                 <div class="space-y-5">
                     <input type="text" id="editTxNameDesc" placeholder="Name / Description" class="input-glass w-full p-4 text-base">
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                    <div class="relative flex items-center">
+                        <i data-lucide="indian-rupee" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
                         <input type="number" id="editTxAmount" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-3">
@@ -295,9 +299,12 @@
                 <h3 class="text-base font-bold mb-1 uppercase tracking-widest text-white">Add Past Expense</h3>
                 <p id="pastTargetMonthLabel" class="text-xs text-neonBlue uppercase tracking-widest mb-6 font-bold font-mono">Month</p>
                 <div class="space-y-5">
-                    <input type="text" id="pastExpenseName" placeholder="Expense Name..." class="input-glass w-full p-4 text-base">
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                    <div class="relative flex items-center">
+                        <i data-lucide="tag" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="pastExpenseName" placeholder="Expense Name..." class="input-glass w-full p-4 text-base pl-10">
+                    </div>
+                    <div class="relative flex items-center">
+                        <i data-lucide="indian-rupee" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
                         <input type="number" id="pastExpenseAmount" step="0.01" placeholder="0.00" class="input-glass w-full p-4 font-mono text-2xl pl-10">
                     </div>
                     <div class="flex items-center gap-2 bg-white/5 p-2 rounded-2xl border border-white/10">

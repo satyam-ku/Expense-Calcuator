@@ -1,4 +1,4 @@
-<div id="tab-notes-content" class="animate-pop-in flex flex-col gap-6 relative">
+<div id="tab-notes-content" class="animate-pop-in flex flex-col gap-6 relative pb-24">
     
     <!-- Category & Folder Navigation Pill Bar -->
     <div class="flex flex-col gap-3">
@@ -22,9 +22,9 @@
 
     <!-- Search, View Toggle, and Sort Bar -->
     <div class="flex flex-col md:flex-row gap-3 px-1">
-        <div class="relative flex-1">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-            <input type="text" id="noteSearch" oninput="renderNotes()" placeholder="SEARCH NOTES BY TITLE, CONTENT, OR CATEGORY..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-neonBlue transition-all">
+        <div class="relative flex-1 flex items-center">
+            <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" id="noteSearch" oninput="renderNotes()" placeholder="SEARCH NOTES BY TITLE, CONTENT, OR CATEGORY..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-neonBlue transition-all">
         </div>
         <div class="flex gap-2 shrink-0">
             <!-- Grid vs List Toggle -->
@@ -33,12 +33,15 @@
                 <span id="labelViewMode">Grid</span>
             </button>
             <!-- Sort Selector -->
-            <select id="selectNotesSort" onchange="changeNotesSortOrder(this.value)" class="px-3 py-2.5 rounded-2xl bg-black border border-white/10 text-xs text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
-                <option value="date-desc" class="bg-black">Newest First</option>
-                <option value="date-asc" class="bg-black">Oldest First</option>
-                <option value="title" class="bg-black">Alphabetical</option>
-                <option value="category" class="bg-black">By Category</option>
-            </select>
+            <div class="relative flex items-center">
+                <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none"></i>
+                <select id="selectNotesSort" onchange="changeNotesSortOrder(this.value)" class="pl-9 pr-3 py-2.5 rounded-2xl bg-black border border-white/10 text-xs text-amber-100 uppercase tracking-wider focus:outline-none font-mono">
+                    <option value="date-desc" class="bg-black">Newest First</option>
+                    <option value="date-asc" class="bg-black">Oldest First</option>
+                    <option value="title" class="bg-black">Alphabetical</option>
+                    <option value="category" class="bg-black">By Category</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -66,8 +69,8 @@
     </div>
 
     <!-- Floating Add Button (FAB) -->
-    <button onclick="openCreateNoteModal()" title="Create New Note" class="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black flex items-center justify-center text-2xl shadow-[0_10px_30px_rgba(245,166,35,0.4)] hover:scale-110 active:scale-95 transition-all">
-        <i class="fa-solid fa-plus"></i>
+    <button onclick="openCreateNoteModal()" title="Create New Note" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-black flex items-center justify-center shadow-[0_10px_30px_rgba(245,166,35,0.4)] hover:scale-110 active:scale-95 transition-all cursor-pointer">
+        <i data-lucide="plus" class="w-7 h-7 text-black stroke-[2.5]"></i>
     </button>
 
     <!-- Create / Edit Note Modal Overlay -->
@@ -143,17 +146,17 @@
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
                     <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Data Management</h4>
                     <button onclick="exportNotesJSON()" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-white/10 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-download"></i> Export All Notes (JSON)
+                        <i data-lucide="download" class="w-4 h-4"></i> Export All Notes (JSON)
                     </button>
                     <button onclick="exportNotesTXT()" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-white/10 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-lines"></i> Export All Notes (Text)
+                        <i data-lucide="download" class="w-4 h-4"></i> Export All Notes (Text)
                     </button>
                 </div>
 
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
                     <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider">Danger Zone</h4>
                     <button onclick="emptyTrashBin()" class="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-trash-can"></i> Empty Trash Bin
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Empty Trash Bin
                     </button>
                 </div>
             </div>
