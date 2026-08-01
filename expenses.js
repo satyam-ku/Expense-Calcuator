@@ -479,11 +479,13 @@ function renderHistoryView(dataList, title, mode) {
     const grouped = {};
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     dataList.forEach(item => {
-        const parts = item.date.split(' ');
+        const parts = item.date ? item.date.split(' ') : [];
         let month = '';
         if (parts.length > 1) {
-            const possibleMonth = parts[1].replace(',', '');
-            if (months.includes(possibleMonth)) month = possibleMonth;
+            const possibleMonth1 = parts[1].replace(',', '');
+            const possibleMonth0 = parts[0].replace(',', '');
+            if (months.includes(possibleMonth1)) month = possibleMonth1;
+            else if (months.includes(possibleMonth0)) month = possibleMonth0;
         }
         if (month) {
             if (!grouped[month]) grouped[month] = [];
@@ -502,24 +504,28 @@ function renderHistoryView(dataList, title, mode) {
         sortedMonths.forEach(m => {
             let monthTotal = 0; let txHtml = ''; let dailyGroups = {};
             grouped[m].forEach(t => {
-                monthTotal += t.amount;
+                const amtVal = (mode === 'ledger' && t.type === 'GOT') ? -t.amount : t.amount;
+                monthTotal += amtVal;
                 let dateKey = t.date.split(',')[0].trim();
                 if (!dailyGroups[dateKey]) dailyGroups[dateKey] = { total: 0, list: [] };
-                dailyGroups[dateKey].total += t.amount;
+                dailyGroups[dateKey].total += amtVal;
                 dailyGroups[dateKey].list.push(t);
             });
             const sortedDays = Object.keys(dailyGroups).sort((a, b) => parseInt(b) - parseInt(a));
             sortedDays.forEach(day => {
-                txHtml += `<div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span><span class="text-[10px] font-mono font-bold text-neonBlue">₹${formatMoney(dailyGroups[day].total)}</span></div>`;
+                const dayTotalDisplay = Math.abs(dailyGroups[day].total);
+                const dayColor = (mode === 'ledger' && dailyGroups[day].total < 0) ? 'text-red-400' : 'text-neonBlue';
+                txHtml += `<div class="bg-white/5 px-3 py-2 mt-2 mb-1 rounded flex justify-between items-center border border-white/5"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${day}</span><span class="text-[10px] font-mono font-bold ${dayColor}">₹${formatMoney(dayTotalDisplay)}</span></div>`;
                 dailyGroups[day].list.forEach(t => {
                     if (mode === 'expense') {
-                        txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon} text-xs"></i></div><div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div></div><div class="text-right flex items-center gap-3"><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span><button onclick="closeHistory(); openEditTxModal('expense', ${t.id})" class="text-[9px] text-neonBlue uppercase">EDIT</button></div></div>`;
+                        txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-neonBlue/70"><i class="fa-solid ${t.icon || 'fa-receipt'} text-xs"></i></div><div><p class="text-xs text-gray-300 font-bold">${t.name}</p><p class="text-[9px] text-gray-500">${t.date}</p></div></div><div class="text-right flex items-center gap-3"><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span><button onclick="closeHistory(); openEditTxModal('expense', ${t.id})" class="text-[9px] text-neonBlue uppercase">EDIT</button></div></div>`;
                     } else {
                         txHtml += `<div class="flex justify-between items-center py-2 px-2 border-b border-white/5 last:border-0 pl-4"><div><p class="text-xs text-gray-300 font-bold">${t.desc || (t.type==='GAVE'?'Gave':'Got')}</p><p class="text-[9px] font-bold ${t.type==='GAVE'?'text-neonBlue':'text-red-400'}">${t.type} • ${t.date}</p></div><div class="text-right flex items-center gap-3"><span class="text-xs font-mono text-white">₹${formatMoney(t.amount)}</span><button onclick="closeHistory(); openEditTxModal('ledger', ${t.id})" class="text-[9px] text-neonBlue uppercase">EDIT</button></div></div>`;
                     }
                 });
             });
-            container.innerHTML += `<div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden"><button onclick="toggleHistoryMonth('${m}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition"><div class="text-left"><span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span></div><div class="flex items-center gap-3 text-right"><div><span class="block text-neonGreen font-mono font-bold text-sm">₹${formatMoney(monthTotal)}</span><span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span></div><i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${m}"></i></div></button><div id="hist-${m}" class="hidden p-2 bg-black/20">${txHtml}</div></div>`;
+            const monthTotalColor = (mode === 'ledger' && monthTotal < 0) ? 'text-red-400' : 'text-neonGreen';
+            container.innerHTML += `<div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden"><button onclick="toggleHistoryMonth('${m}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition"><div class="text-left"><span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span></div><div class="flex items-center gap-3 text-right"><div><span class="block ${monthTotalColor} font-mono font-bold text-sm">₹${formatMoney(Math.abs(monthTotal))}</span><span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span></div><i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${m}"></i></div></button><div id="hist-${m}" class="hidden p-2 bg-black/20">${txHtml}</div></div>`;
         });
     }
     const modal = document.getElementById('historyModal');
@@ -556,9 +562,16 @@ function openEditTxModal(mode, id) {
         currentName = item.name;
         currentAmt = item.amount;
     } else if (mode === 'ledger') {
-        const p = peopleData.find(x => x.id === activePersonId);
-        if (!p) return;
-        const tx = p.transactions.find(t => t.id === id);
+        let p = peopleData.find(x => x.id === activePersonId);
+        let tx = p ? p.transactions.find(t => t.id === id) : null;
+        if (!tx) {
+            for (let person of peopleData) {
+                if (person.transactions) {
+                    tx = person.transactions.find(t => t.id === id);
+                    if (tx) { p = person; break; }
+                }
+            }
+        }
         if (!tx) return;
         currentName = tx.desc || "";
         currentAmt = tx.amount;
@@ -572,6 +585,7 @@ function openEditTxModal(mode, id) {
     const modal = document.getElementById('editTxModal');
     if (modal) modal.classList.remove('hidden');
 }
+
 
 function closeEditTxModal() {
     const modal = document.getElementById('editTxModal');

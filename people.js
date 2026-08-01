@@ -415,6 +415,26 @@ function showPersonMonthlyStats() {
     if (modal) modal.classList.remove('hidden');
 }
 
+function showPersonHistory() {
+    const p = peopleData.find(x => x.id === activePersonId);
+    if (!p) return;
+
+    let txs = p.transactions || [];
+    if (p.isGroup && p.members) {
+        txs = [];
+        p.members.forEach(mId => {
+            const m = peopleData.find(x => x.id === mId);
+            if (m && m.transactions) {
+                m.transactions.filter(t => t.desc && t.desc.startsWith(`(Group: ${p.name})`)).forEach(t => {
+                    txs.push({ ...t, desc: `${m.name}: ${t.desc}` });
+                });
+            }
+        });
+    }
+
+    renderHistoryView(txs, `${p.name} History`, 'ledger');
+}
+
 function exportPersonCSV() {
     const p = peopleData.find(x => x.id === activePersonId); 
     if (!p) return; 
