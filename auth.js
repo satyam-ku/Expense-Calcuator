@@ -45,7 +45,7 @@ function showLogin() {
     }
 }
 
-function registerUser() {
+async function registerUser() {
     const nameEl = document.getElementById('regName');
     const pinEl = document.getElementById('regPin');
     if (!nameEl || !pinEl) return;
@@ -57,11 +57,22 @@ function registerUser() {
     const newUser = { id: 'u_' + Date.now(), name: name, pin: pin };
     userRegistry.push(newUser);
     localStorage.setItem('neonFlux_registry', JSON.stringify(userRegistry));
+    
+    try {
+        await fetch(`${API_BASE}/api/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUser)
+        });
+    } catch (e) {
+        console.warn("Backend user registration failed, saved locally:", e);
+    }
+    
     currentUser = newUser;
-    loadApp();
+    await loadApp();
 }
 
-function authenticateUser() {
+async function authenticateUser() {
     const select = document.getElementById('userSelect');
     const pinField = document.getElementById('authPin');
     if (!select || !pinField) return;
@@ -70,7 +81,7 @@ function authenticateUser() {
     const user = userRegistry.find(u => u.id === selectedId);
     if (user && pinField.value.trim() === user.pin) {
         currentUser = user;
-        loadApp();
+        await loadApp();
         pinField.value = '';
     } else {
         pinField.classList.add('animate-shake');
@@ -79,7 +90,7 @@ function authenticateUser() {
     }
 }
 
-function loadApp() {
+async function loadApp() {
     const loginView = document.getElementById('login-view');
     if (loginView) {
         loginView.style.display = 'none';
@@ -92,7 +103,7 @@ function loadApp() {
     const userHeader = document.getElementById('headerUsername');
     if (userHeader) userHeader.innerText = currentUser.name;
     
-    loadData(); 
+    await loadData(); 
     if (!location.hash.startsWith('#/expenses') && !location.hash.startsWith('#/people') && !location.hash.startsWith('#/notes')) {
         location.hash = '#/expenses';
     } else {

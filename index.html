@@ -77,8 +77,9 @@
                 </div>
                 <input type="password" id="authPin" inputmode="numeric" placeholder="• • • •" class="input-glass w-full p-4 font-mono text-3xl tracking-[0.5em] text-amber-400" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
                 <button onclick="authenticateUser()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold py-4 rounded-2xl shadow-[0_0_25px_rgba(245,166,35,0.35)] mt-4 hover:scale-[1.02] transition-transform text-sm tracking-widest uppercase">Unlock Dashboard</button>
-                <div class="flex justify-between mt-8 px-2">
+                <div class="flex justify-between items-center mt-8 px-2">
                     <button onclick="showRegister()" class="text-[10px] text-amber-600 hover:text-amber-400 transition-colors uppercase tracking-widest">+ Create Account</button>
+                    <div id="dbConnectionBadgeLogin"></div>
                     <button onclick="resetSystem()" class="text-[10px] text-amber-900 hover:text-red-500 transition-colors uppercase tracking-widest">System Reset</button>
                 </div>
             </div>
@@ -99,7 +100,10 @@
                     <a href="#/people" id="btn-tab-people" class="tab-btn flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i>People</a>
                     <a href="#/notes" id="btn-tab-notes" class="tab-btn flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i>Notes</a>
                 </div>
-                <button onclick="logout()" title="Logout" class="text-gray-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 hover:border-amber-400/30"><i data-lucide="power" class="w-4 h-4"></i></button>
+                <div class="flex items-center gap-2">
+                    <div id="dbConnectionBadge"></div>
+                    <button onclick="logout()" title="Logout" class="text-gray-400 hover:text-white transition w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 hover:border-amber-400/30"><i data-lucide="power" class="w-4 h-4"></i></button>
+                </div>
             </div>
         </header>
 
