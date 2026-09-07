@@ -2,34 +2,20 @@
 
 function parseTxDate(dateStr) {
     if (!dateStr) return 0;
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const cleanStr = dateStr.replace(',', '');
-    const parts = cleanStr.split(/\s+/);
-    if (parts.length >= 2) {
-        let day = parseInt(parts[0]) || 1;
-        let monthName = parts[1];
-        let monthIdx = months.indexOf(monthName);
-        if (monthIdx === -1) {
-            monthIdx = months.indexOf(parts[0]);
-            if (monthIdx !== -1) day = parseInt(parts[1]) || 1;
+    const parts = extractDateParts(dateStr);
+    const cleanStr = String(dateStr).replace(/,/g, ' ');
+    const tokens = cleanStr.trim().split(/\s+/);
+    let hours = 12, minutes = 0;
+    for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].includes(':')) {
+            const timeParts = tokens[i].split(':');
+            hours = parseInt(timeParts[0]) || 12;
+            minutes = parseInt(timeParts[1]) || 0;
         }
-        if (monthIdx !== -1) {
-            const currentYear = new Date().getFullYear();
-            let hours = 12, minutes = 0;
-            for (let i = 2; i < parts.length; i++) {
-                if (parts[i].includes(':')) {
-                    const timeParts = parts[i].split(':');
-                    hours = parseInt(timeParts[0]) || 12;
-                    minutes = parseInt(timeParts[1]) || 0;
-                }
-                if (parts[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
-                if (parts[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
-            }
-            return new Date(currentYear, monthIdx, day, hours, minutes).getTime();
-        }
+        if (tokens[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
+        if (tokens[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
     }
-    const parsed = Date.parse(dateStr);
-    return isNaN(parsed) ? 0 : parsed;
+    return new Date(parts.year, parts.monthIdx, parts.day, hours, minutes).getTime();
 }
 
 function openManual() {
@@ -351,12 +337,16 @@ function renderPersonDetailsInternal(p) {
     const statusEl = document.getElementById('detailStatus');
     if (statusEl) statusEl.innerText = finalAmount > 0 ? 'OWES YOU' : (finalAmount < 0 ? 'YOU OWE' : 'SETTLED');
     
-    const currentMonth = new Date().toLocaleDateString('en-IN', { month: 'short' });
+    const currentMonthYear = formatCurrentMonthYear();
     let filteredTx = [...p.transactions];
     if (searchQuery) {
         filteredTx = filteredTx.filter(t => (t.desc && t.desc.toLowerCase().includes(searchQuery)) || t.date.toLowerCase().includes(searchQuery) || t.type.toLowerCase().includes(searchQuery));
     } else {
-        filteredTx = filteredTx.filter(t => t.date.includes(currentMonth));
+        if (personTxMonthFilter === 'all') {
+            // Show all history
+        } else {
+            filteredTx = filteredTx.filter(t => isItemInMonthYear(t, currentMonthYear));
+        }
     }
 
     // Apply Sorting strictly based on Transaction Date
@@ -381,38 +371,68 @@ function renderPersonDetailsInternal(p) {
     });
     
     if (filteredTx.length === 0) {
-        list.innerHTML = `<p class="text-center text-xs text-gray-500 font-mono py-6 uppercase tracking-widest">${searchQuery ? 'No Match Found' : 'No Recent Transactions'}</p>`;
+        list.innerHTML = `<p class="text-center text-xs text-gray-500 font-mono py-6 uppercase tracking-widest">${searchQuery ? 'No Match Found' : 'No Transactions for Selected Period'}</p>`;
     }
+}
+
+function togglePersonTxMonthFilter() {
+    personTxMonthFilter = (personTxMonthFilter === 'all') ? 'current' : 'all';
+    const btn = document.getElementById('btnTogglePersonTxFilter');
+    if (btn) {
+        btn.innerText = personTxMonthFilter === 'all' ? 'Showing: All' : 'Showing: Month';
+    }
+    const p = peopleData.find(x => x.id === activePersonId);
+    if (p) renderPersonDetailsInternal(p);
 }
 
 function showPersonMonthlyStats() {
     const p = peopleData.find(x => x.id === activePersonId); 
     if (!p || p.isGroup) return alert("Monthly stats available for individual ledgers only.");
     const stats = {}; 
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     p.transactions.forEach(t => {
-        const parts = t.date.split(' '); 
-        let month = '';
-        if (parts.length > 1) { 
-            const possibleMonth = parts[1].replace(',', ''); 
-            if (months.includes(possibleMonth)) month = possibleMonth; 
-        }
-        if (month) { 
-            if (!stats[month]) stats[month] = { gave: 0, got: 0 }; 
-            if (t.type === 'GAVE') stats[month].gave += t.amount; 
-            else stats[month].got += t.amount; 
-        }
+        const parts = extractDateParts(t.date, t.id);
+        const mKey = parts.monthYearKey;
+        if (!stats[mKey]) stats[mKey] = { gave: 0, got: 0, count: 0 }; 
+        if (t.type === 'GAVE') stats[mKey].gave += t.amount; 
+        else stats[mKey].got += t.amount; 
+        stats[mKey].count++;
     });
+
+    const titleEl = document.getElementById('statsModalTitle');
+    if (titleEl) titleEl.innerText = `${p.name} - Monthly Stats`;
+
     const listEl = document.getElementById('monthlyStatsList'); 
     if (!listEl) return;
     listEl.innerHTML = '';
-    const sortedMonths = Object.keys(stats).sort((a,b) => months.indexOf(a) - months.indexOf(b));
-    if (sortedMonths.length === 0) listEl.innerHTML = '<p class="text-center text-sm text-gray-500 font-mono py-6 uppercase tracking-widest">No Transactions Found</p>';
-    else sortedMonths.forEach(m => { 
-        listEl.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border border-white/10 mb-2"><div class="flex justify-between items-center mb-2"><span class="text-base font-bold text-gray-300 uppercase tracking-widest">${m}</span></div><div class="flex justify-between text-xs font-mono"><span class="text-neonBlue">Gave: ₹${formatMoney(stats[m].gave)}</span><span class="text-red-500">Got: ₹${formatMoney(stats[m].got)}</span></div></div>`; 
-    });
+    const sortedMonths = Object.keys(stats).sort(compareMonthYearDesc);
+    if (sortedMonths.length === 0) {
+        listEl.innerHTML = '<p class="text-center text-sm text-gray-500 font-mono py-6 uppercase tracking-widest">No Transactions Found</p>';
+    } else {
+        sortedMonths.forEach(m => { 
+            const net = stats[m].gave - stats[m].got;
+            const netBadge = net > 0 
+                ? `<span class="text-xs text-neonBlue font-mono font-bold">+₹${formatMoney(net)} (Owed)</span>`
+                : (net < 0 ? `<span class="text-xs text-red-400 font-mono font-bold">-₹${formatMoney(Math.abs(net))} (You Owe)</span>` : `<span class="text-xs text-gray-400 font-mono font-bold">Settled</span>`);
+            listEl.innerHTML += `
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 mb-3 animate-slide-up">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-base font-bold text-white uppercase tracking-widest">${m}</span>
+                    <span class="text-[10px] text-gray-400 font-mono uppercase tracking-widest">${stats[m].count} Txns</span>
+                </div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                    <span class="text-neonBlue font-bold">Gave: ₹${formatMoney(stats[m].gave)}</span>
+                    <span class="text-red-400 font-bold">Got: ₹${formatMoney(stats[m].got)}</span>
+                </div>
+                <div class="pt-2 border-t border-white/5 flex justify-between items-center">
+                    <span class="text-[10px] text-gray-400 uppercase font-mono">Net Balance:</span>
+                    ${netBadge}
+                </div>
+            </div>`; 
+        });
+    }
     const modal = document.getElementById('monthlyStatsModal');
     if (modal) modal.classList.remove('hidden');
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
 function showPersonHistory() {
@@ -510,7 +530,7 @@ function submitPersonTx() {
     const desc = descEl ? descEl.value : '';
     const now = Date.now(); 
     const d = new Date();
-    const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = formatCurrentDateTime(d);
     
     if (activeTxType === 'GAVE') {
         const isNormalPerson = !p.isGroup && (!p.interestMode || p.interestMode === 'none');

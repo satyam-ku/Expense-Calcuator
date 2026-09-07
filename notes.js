@@ -4,34 +4,20 @@ let editingNoteId = null;
 
 function parseTxDate(dateStr) {
     if (!dateStr) return 0;
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const cleanStr = dateStr.replace(',', '');
-    const parts = cleanStr.split(/\s+/);
-    if (parts.length >= 2) {
-        let day = parseInt(parts[0]) || 1;
-        let monthName = parts[1];
-        let monthIdx = months.indexOf(monthName);
-        if (monthIdx === -1) {
-            monthIdx = months.indexOf(parts[0]);
-            if (monthIdx !== -1) day = parseInt(parts[1]) || 1;
+    const parts = extractDateParts(dateStr);
+    const cleanStr = String(dateStr).replace(/,/g, ' ');
+    const tokens = cleanStr.trim().split(/\s+/);
+    let hours = 12, minutes = 0;
+    for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].includes(':')) {
+            const timeParts = tokens[i].split(':');
+            hours = parseInt(timeParts[0]) || 12;
+            minutes = parseInt(timeParts[1]) || 0;
         }
-        if (monthIdx !== -1) {
-            const currentYear = new Date().getFullYear();
-            let hours = 12, minutes = 0;
-            for (let i = 2; i < parts.length; i++) {
-                if (parts[i].includes(':')) {
-                    const timeParts = parts[i].split(':');
-                    hours = parseInt(timeParts[0]) || 12;
-                    minutes = parseInt(timeParts[1]) || 0;
-                }
-                if (parts[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
-                if (parts[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
-            }
-            return new Date(currentYear, monthIdx, day, hours, minutes).getTime();
-        }
+        if (tokens[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
+        if (tokens[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
     }
-    const parsed = Date.parse(dateStr);
-    return isNaN(parsed) ? 0 : parsed;
+    return new Date(parts.year, parts.monthIdx, parts.day, hours, minutes).getTime();
 }
 
 // 1. Schema Migration & Data Normalization
@@ -520,7 +506,7 @@ function submitSaveNoteModal() {
     if (!title || !content) return alert("Note Title and Content required.");
     
     const now = new Date();
-    const timestamp = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const timestamp = formatCurrentDateTime(now);
     
     if (editingNoteId !== null) {
         // Update Existing
@@ -702,7 +688,7 @@ function commitNoteViewerSave() {
     const targetIdx = notesData.findIndex(n => n.id === activeNoteViewingId);
     if (targetIdx !== -1) {
         const now = new Date();
-        const timestamp = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        const timestamp = formatCurrentDateTime(now);
         
         notesData[targetIdx].title = newTitle;
         notesData[targetIdx].content = newContent;

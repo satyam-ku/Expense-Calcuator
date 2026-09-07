@@ -1,38 +1,25 @@
 /* FinCaL Personal Expenses & Budget Controller */
 
 let currentAnalyticsTab = 'category'; // 'category' | 'history'
+let categoryAnalyticsMonth = 'current'; // 'current' | 'all' | specific 'MMM YYYY'
 
 // Helper function to parse transaction date string into timestamp
 function parseTxDate(dateStr) {
     if (!dateStr) return 0;
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const cleanStr = dateStr.replace(',', '');
-    const parts = cleanStr.split(/\s+/);
-    if (parts.length >= 2) {
-        let day = parseInt(parts[0]) || 1;
-        let monthName = parts[1];
-        let monthIdx = months.indexOf(monthName);
-        if (monthIdx === -1) {
-            monthIdx = months.indexOf(parts[0]);
-            if (monthIdx !== -1) day = parseInt(parts[1]) || 1;
+    const parts = extractDateParts(dateStr);
+    const cleanStr = String(dateStr).replace(/,/g, ' ');
+    const tokens = cleanStr.trim().split(/\s+/);
+    let hours = 12, minutes = 0;
+    for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].includes(':')) {
+            const timeParts = tokens[i].split(':');
+            hours = parseInt(timeParts[0]) || 12;
+            minutes = parseInt(timeParts[1]) || 0;
         }
-        if (monthIdx !== -1) {
-            const currentYear = new Date().getFullYear();
-            let hours = 12, minutes = 0;
-            for (let i = 2; i < parts.length; i++) {
-                if (parts[i].includes(':')) {
-                    const timeParts = parts[i].split(':');
-                    hours = parseInt(timeParts[0]) || 12;
-                    minutes = parseInt(timeParts[1]) || 0;
-                }
-                if (parts[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
-                if (parts[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
-            }
-            return new Date(currentYear, monthIdx, day, hours, minutes).getTime();
-        }
+        if (tokens[i].toUpperCase() === 'PM' && hours < 12) hours += 12;
+        if (tokens[i].toUpperCase() === 'AM' && hours === 12) hours = 0;
     }
-    const parsed = Date.parse(dateStr);
-    return isNaN(parsed) ? 0 : parsed;
+    return new Date(parts.year, parts.monthIdx, parts.day, hours, minutes).getTime();
 }
 
 // 1. Comprehensive 13-Category Classification Engine
@@ -151,8 +138,7 @@ function addExpense() {
     if (!name || isNaN(amt) || amt <= 0) return;
     
     const now = new Date();
-    const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = formatCurrentDateTime(now);
     
     const cat = getCategoryForExpense(name);
     
@@ -160,7 +146,7 @@ function addExpense() {
         id: Date.now(), 
         name: name, 
         amount: amt,
-        date: `${dateStr}, ${timeStr}`,
+        date: dateStr,
         icon: cat.icon
     });
     
@@ -180,6 +166,11 @@ function changeExpensesSortOrder(order) {
     renderExpenses();
 }
 
+function changeExpensesMonthFilter(val) {
+    expensesMonthFilter = val;
+    renderExpenses();
+}
+
 function toggleShowAllExpenses() {
     showAllExpenses = !showAllExpenses;
     renderExpenses();
@@ -188,10 +179,31 @@ function toggleShowAllExpenses() {
 function renderExpenses() {
     const searchInput = document.getElementById('expenseSearch');
     const query = searchInput ? searchInput.value.toLowerCase() : '';
-    const currentMonth = new Date().toLocaleDateString('en-IN', { month: 'short' });
+    const currentMonthYear = formatCurrentMonthYear();
     
     const sortSel = document.getElementById('selectExpensesSort');
     if (sortSel) sortSel.value = expensesSortOrder;
+    
+    // Sync month filter dropdown if present
+    const monthFilterSel = document.getElementById('selectExpensesMonthFilter');
+    if (monthFilterSel) {
+        const availMonths = new Set();
+        availMonths.add(currentMonthYear);
+        expensesData.list.forEach(item => {
+            const p = extractDateParts(item.date, item.id);
+            availMonths.add(p.monthYearKey);
+        });
+        const sortedAvail = Array.from(availMonths).sort(compareMonthYearDesc);
+        
+        let selectHtml = `<option value="current" ${expensesMonthFilter === 'current' ? 'selected' : ''} class="bg-black">This Month (${currentMonthYear})</option>`;
+        selectHtml += `<option value="all" ${expensesMonthFilter === 'all' ? 'selected' : ''} class="bg-black">All History (${expensesData.list.length} txns)</option>`;
+        sortedAvail.forEach(mKey => {
+            if (mKey !== currentMonthYear) {
+                selectHtml += `<option value="${mKey}" ${expensesMonthFilter === mKey ? 'selected' : ''} class="bg-black">${mKey}</option>`;
+            }
+        });
+        monthFilterSel.innerHTML = selectHtml;
+    }
     
     let filtered = [...expensesData.list];
     if (query) {
@@ -200,7 +212,13 @@ function renderExpenses() {
             item.date.toLowerCase().includes(query)
         );
     } else {
-        filtered = filtered.filter(item => item.date.includes(currentMonth));
+        if (expensesMonthFilter === 'all') {
+            // Show all history
+        } else if (expensesMonthFilter === 'current') {
+            filtered = filtered.filter(item => isItemInMonthYear(item, currentMonthYear));
+        } else {
+            filtered = filtered.filter(item => isItemInMonthYear(item, expensesMonthFilter));
+        }
     }
 
     // Apply Sorting strictly based on Transaction Date
@@ -220,7 +238,7 @@ function renderExpenses() {
         return (tB - tA) || (b.id - a.id);
     });
     
-    const liveMonthItems = expensesData.list.filter(item => item.date.includes(currentMonth));
+    const liveMonthItems = expensesData.list.filter(item => isItemInMonthYear(item, currentMonthYear));
     const liveMonthSpent = liveMonthItems.reduce((sum, item) => sum + item.amount, 0);
     
     const remaining = expensesData.budget - liveMonthSpent;
@@ -340,9 +358,13 @@ function showBudgetHistory() {
     const modal = document.getElementById('monthlyStatsModal');
     if (modal) modal.classList.remove('hidden');
 }
-
 function switchAnalyticsTab(tab) {
     currentAnalyticsTab = tab;
+    renderAnalyticsModalContent();
+}
+
+function changeCategoryAnalyticsMonth(mKey) {
+    categoryAnalyticsMonth = mKey;
     renderAnalyticsModalContent();
 }
 
@@ -351,8 +373,7 @@ function renderAnalyticsModalContent() {
     if (!listEl) return;
     listEl.innerHTML = '';
     
-    const currentMonth = new Date().toLocaleDateString('en-IN', { month: 'short' });
-    const liveMonthItems = expensesData.list.filter(item => item.date.includes(currentMonth));
+    const currentMonthYear = formatCurrentMonthYear();
     
     // Navigation Sub-Header Buttons inside Modal
     let navHtml = `
@@ -363,10 +384,54 @@ function renderAnalyticsModalContent() {
     `;
     
     if (currentAnalyticsTab === 'category') {
-        const { categories, totalSpent } = calculateCategoryBreakdown(liveMonthItems);
+        // Collect all available months from list and historyStats
+        const monthKeysSet = new Set();
+        monthKeysSet.add(currentMonthYear);
+        if (expensesData.historyStats) {
+            Object.keys(expensesData.historyStats).forEach(k => {
+                const p = parseMonthYearKey(k);
+                monthKeysSet.add(`${p.month} ${p.year}`);
+            });
+        }
+        expensesData.list.forEach(item => {
+            const p = extractDateParts(item.date, item.id);
+            monthKeysSet.add(p.monthYearKey);
+        });
+        const sortedMonthKeys = Array.from(monthKeysSet).sort(compareMonthYearDesc);
+        
+        let monthOptionsHtml = `<option value="current" ${categoryAnalyticsMonth === 'current' ? 'selected' : ''} class="bg-black">Current Month (${currentMonthYear})</option>`;
+        monthOptionsHtml += `<option value="all" ${categoryAnalyticsMonth === 'all' ? 'selected' : ''} class="bg-black">All Time (${expensesData.list.length} txns)</option>`;
+        sortedMonthKeys.forEach(mKey => {
+            if (mKey !== currentMonthYear) {
+                monthOptionsHtml += `<option value="${mKey}" ${categoryAnalyticsMonth === mKey ? 'selected' : ''} class="bg-black">${mKey}</option>`;
+            }
+        });
+
+        let filterBarHtml = `
+            <div class="mb-4 flex items-center justify-between gap-2 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <span class="text-[10px] text-gray-400 uppercase tracking-widest font-mono font-bold pl-1 flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i> Period:
+                </span>
+                <select onchange="changeCategoryAnalyticsMonth(this.value)" class="bg-black border border-white/10 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-mono focus:outline-none flex-1 max-w-[210px]">
+                    ${monthOptionsHtml}
+                </select>
+            </div>
+        `;
+
+        let targetItems = [];
+        if (categoryAnalyticsMonth === 'all') {
+            targetItems = [...expensesData.list];
+        } else if (categoryAnalyticsMonth === 'current') {
+            targetItems = expensesData.list.filter(item => isItemInMonthYear(item, currentMonthYear));
+        } else {
+            targetItems = expensesData.list.filter(item => isItemInMonthYear(item, categoryAnalyticsMonth));
+        }
+
+        const { categories, totalSpent } = calculateCategoryBreakdown(targetItems);
         
         if (categories.length === 0) {
-            listEl.innerHTML = navHtml + '<p class="text-center text-sm text-gray-500 py-10 uppercase tracking-widest">No Category Data Recorded</p>';
+            listEl.innerHTML = navHtml + filterBarHtml + '<p class="text-center text-sm text-gray-500 py-10 uppercase tracking-widest font-mono">No Category Data For Period</p>';
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
             return;
         }
         
@@ -424,47 +489,97 @@ function renderAnalyticsModalContent() {
         });
         sliceBarsHtml += '</div>';
         
-        listEl.innerHTML = navHtml + doughnutHtml + sliceBarsHtml;
+        listEl.innerHTML = navHtml + filterBarHtml + doughnutHtml + sliceBarsHtml;
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
         
     } else {
         // Monthly History Tab
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const currentLimit = expensesData.budget;
-        const currentSpent = liveMonthItems.reduce((sum, item) => sum + item.amount, 0);
-        
-        const liveData = { month: currentMonth, limit: currentLimit, spent: currentSpent, balance: currentLimit - currentSpent };
-
-        let allData = [];
+        const monthKeysSet = new Set();
+        monthKeysSet.add(currentMonthYear);
         if (expensesData.historyStats) {
-            Object.keys(expensesData.historyStats).forEach(m => {
-                const h = expensesData.historyStats[m];
-                allData.push({ month: m, limit: h.limit, spent: h.spent, balance: h.limit - h.spent });
+            Object.keys(expensesData.historyStats).forEach(k => {
+                const p = parseMonthYearKey(k);
+                monthKeysSet.add(`${p.month} ${p.year}`);
             });
         }
-        if (!allData.find(d => d.month === currentMonth)) allData.push(liveData);
-        allData.sort((a,b) => months.indexOf(b.month) - months.indexOf(a.month));
+        expensesData.list.forEach(item => {
+            const p = extractDateParts(item.date, item.id);
+            monthKeysSet.add(p.monthYearKey);
+        });
 
-        let historyHtml = '<div class="space-y-3 mt-2">';
-        allData.forEach(d => {
-            const isCurrent = d.month === currentMonth;
-            historyHtml += `
-            <div class="bg-white/5 p-5 rounded-xl border ${isCurrent ? 'border-neonBlue/30' : 'border-white/5'} relative">
-                <button onclick="closeMonthlyStats(); openPastExpenseModal('${d.month}')" class="absolute top-4 right-4 text-[10px] text-neonGreen font-bold uppercase tracking-wider bg-white/5 border border-neonGreen/20 px-2.5 py-1 rounded hover:bg-neonGreen/10 flex items-center gap-1">
-                    <i data-lucide="plus" class="w-3 h-3"></i> Add
-                </button>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-lg font-bold text-white uppercase tracking-widest">${d.month} ${isCurrent ? '<span class="text-[9px] bg-neonBlue text-black px-1.5 py-0.5 rounded ml-2">LIVE</span>' : ''}</span>
-                    <span class="text-sm font-mono text-gray-400 mr-16">Limit: ₹${formatMoney(d.limit)}</span>
+        const sortedMonthKeys = Array.from(monthKeysSet).sort(compareMonthYearDesc);
+
+        let allData = [];
+        sortedMonthKeys.forEach(mKey => {
+            const isCurrent = (mKey === currentMonthYear);
+            const mItems = expensesData.list.filter(item => isItemInMonthYear(item, mKey));
+            const mSpent = mItems.reduce((sum, item) => sum + item.amount, 0);
+            
+            let mLimit = 0;
+            if (isCurrent) {
+                mLimit = expensesData.budget;
+            } else if (expensesData.historyStats && expensesData.historyStats[mKey]) {
+                mLimit = expensesData.historyStats[mKey].limit || 0;
+            }
+
+            allData.push({
+                month: mKey,
+                limit: mLimit,
+                spent: mSpent,
+                balance: mLimit - mSpent,
+                txCount: mItems.length,
+                isCurrent
+            });
+        });
+
+        let topBarHtml = `
+            <div class="flex justify-between items-center mb-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                <div>
+                    <span class="text-xs font-mono font-bold text-white uppercase tracking-wider block">History Timeline</span>
+                    <span class="text-[9px] text-gray-400 font-mono uppercase tracking-widest">${allData.length} Month${allData.length > 1 ? 's' : ''} Recorded</span>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><p class="text-[10px] text-gray-500 uppercase">Spent</p><p class="text-neonRed font-mono font-bold">₹${formatMoney(d.spent)}</p></div>
-                    <div class="text-right"><p class="text-[10px] text-gray-500 uppercase">Balance</p><p class="text-neonGreen font-mono font-bold">₹${formatMoney(d.balance)}</p></div>
+                <button onclick="closeMonthlyStats(); openPastExpenseModal()" class="text-[11px] text-black font-bold uppercase tracking-wider bg-neonGreen hover:bg-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,255,157,0.3)] transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Past Month
+                </button>
+            </div>
+        `;
+
+        let historyHtml = '<div class="space-y-3">';
+        allData.forEach(d => {
+            historyHtml += `
+            <div class="bg-white/5 p-5 rounded-xl border ${d.isCurrent ? 'border-neonBlue/30 shadow-[0_0_15px_rgba(0,243,255,0.1)]' : 'border-white/5'} relative">
+                <div class="absolute top-4 right-4 flex items-center gap-2">
+                    <button onclick="categoryAnalyticsMonth='${d.month}'; switchAnalyticsTab('category')" title="View Breakdown" class="text-[10px] text-amber-400 font-bold uppercase tracking-wider bg-white/5 border border-amber-400/20 px-2 py-1 rounded hover:bg-amber-400/10 flex items-center gap-1">
+                        <i data-lucide="pie-chart" class="w-3 h-3"></i> Chart
+                    </button>
+                    <button onclick="closeMonthlyStats(); openPastExpenseModal('${d.month}')" class="text-[10px] text-neonGreen font-bold uppercase tracking-wider bg-white/5 border border-neonGreen/20 px-2.5 py-1 rounded hover:bg-neonGreen/10 flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3 h-3"></i> Add
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-base font-bold text-white uppercase tracking-widest">${d.month} ${d.isCurrent ? '<span class="text-[9px] bg-neonBlue text-black px-1.5 py-0.5 rounded ml-2 font-mono font-bold">LIVE</span>' : ''}</span>
+                    <span class="text-xs font-mono text-gray-400 mr-28">Limit: ₹${formatMoney(d.limit)}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <p class="text-[9px] text-gray-500 uppercase font-mono">Spent</p>
+                        <p class="text-neonRed font-mono font-bold text-sm">₹${formatMoney(d.spent)}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] text-gray-500 uppercase font-mono">Balance</p>
+                        <p class="${d.balance >= 0 ? 'text-neonGreen' : 'text-neonRed'} font-mono font-bold text-sm">₹${formatMoney(d.balance)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] text-gray-500 uppercase font-mono">Txns</p>
+                        <p class="text-gray-300 font-mono font-bold text-sm">${d.txCount}</p>
+                    </div>
                 </div>
             </div>`;
         });
         historyHtml += '</div>';
         
-        listEl.innerHTML = navHtml + historyHtml;
+        listEl.innerHTML = navHtml + topBarHtml + historyHtml;
+        if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
     }
 }
 
@@ -477,29 +592,20 @@ function renderHistoryView(dataList, title, mode) {
     if (titleEl) titleEl.innerText = title;
     
     const grouped = {};
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     dataList.forEach(item => {
-        const parts = item.date ? item.date.split(' ') : [];
-        let month = '';
-        if (parts.length > 1) {
-            const possibleMonth1 = parts[1].replace(',', '');
-            const possibleMonth0 = parts[0].replace(',', '');
-            if (months.includes(possibleMonth1)) month = possibleMonth1;
-            else if (months.includes(possibleMonth0)) month = possibleMonth0;
-        }
-        if (month) {
-            if (!grouped[month]) grouped[month] = [];
-            grouped[month].push(item);
-        }
+        const p = extractDateParts(item.date, item.id);
+        const mKey = p.monthYearKey;
+        if (!grouped[mKey]) grouped[mKey] = [];
+        grouped[mKey].push(item);
     });
 
     const container = document.getElementById('historyListContainer');
     if (!container) return;
     container.innerHTML = '';
-    const sortedMonths = Object.keys(grouped).sort((a,b) => months.indexOf(b) - months.indexOf(a));
+    const sortedMonths = Object.keys(grouped).sort(compareMonthYearDesc);
 
     if (sortedMonths.length === 0) {
-        container.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest">No History Available</p>';
+        container.innerHTML = '<p class="text-center text-sm text-gray-500 py-6 uppercase tracking-widest font-mono">No History Available</p>';
     } else {
         sortedMonths.forEach(m => {
             let monthTotal = 0; let txHtml = ''; let dailyGroups = {};
@@ -511,7 +617,11 @@ function renderHistoryView(dataList, title, mode) {
                 dailyGroups[dateKey].total += amtVal;
                 dailyGroups[dateKey].list.push(t);
             });
-            const sortedDays = Object.keys(dailyGroups).sort((a, b) => parseInt(b) - parseInt(a));
+            const sortedDays = Object.keys(dailyGroups).sort((a, b) => {
+                const pA = extractDateParts(a);
+                const pB = extractDateParts(b);
+                return pB.day - pA.day;
+            });
             sortedDays.forEach(day => {
                 const dayTotalDisplay = Math.abs(dailyGroups[day].total);
                 const dayColor = (mode === 'ledger' && dailyGroups[day].total < 0) ? 'text-red-400' : 'text-neonBlue';
@@ -525,16 +635,19 @@ function renderHistoryView(dataList, title, mode) {
                 });
             });
             const monthTotalColor = (mode === 'ledger' && monthTotal < 0) ? 'text-red-400' : 'text-neonGreen';
-            container.innerHTML += `<div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden"><button onclick="toggleHistoryMonth('${m}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition"><div class="text-left"><span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span></div><div class="flex items-center gap-3 text-right"><div><span class="block ${monthTotalColor} font-mono font-bold text-sm">₹${formatMoney(Math.abs(monthTotal))}</span><span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span></div><i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${m}"></i></div></button><div id="hist-${m}" class="hidden p-2 bg-black/20">${txHtml}</div></div>`;
+            const safeKey = m.replace(/[^a-zA-Z0-9]/g, '-');
+            container.innerHTML += `<div class="bg-white/5 rounded-2xl border border-white/5 overflow-hidden"><button onclick="toggleHistoryMonth('${safeKey}')" class="w-full flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 transition"><div class="text-left"><span class="text-sm font-bold text-white uppercase tracking-widest block">${m}</span></div><div class="flex items-center gap-3 text-right"><div><span class="block ${monthTotalColor} font-mono font-bold text-sm">₹${formatMoney(Math.abs(monthTotal))}</span><span class="block text-[9px] text-gray-500 uppercase tracking-widest">${grouped[m].length} Txns</span></div><i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform" id="icon-${safeKey}"></i></div></button><div id="hist-${safeKey}" class="hidden p-2 bg-black/20">${txHtml}</div></div>`;
         });
     }
     const modal = document.getElementById('historyModal');
     if (modal) modal.classList.remove('hidden');
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
 function toggleHistoryMonth(month) {
-    const content = document.getElementById(`hist-${month}`);
-    const icon = document.getElementById(`icon-${month}`);
+    const safeKey = String(month).replace(/[^a-zA-Z0-9]/g, '-');
+    const content = document.getElementById(`hist-${safeKey}`);
+    const icon = document.getElementById(`icon-${safeKey}`);
     if (!content) return;
     if (content.classList.contains('hidden')) { 
         content.classList.remove('hidden'); 
@@ -625,9 +738,9 @@ function submitEditedTx() {
     closeEditTxModal();
     
     if (expensesData.historyStats) {
-        Object.keys(expensesData.historyStats).forEach(m => {
-            const mItems = expensesData.list.filter(item => item.date.includes(m));
-            expensesData.historyStats[m].spent = mItems.reduce((sum, i) => sum + i.amount, 0);
+        Object.keys(expensesData.historyStats).forEach(mKey => {
+            const mItems = expensesData.list.filter(item => isItemInMonthYear(item, mKey));
+            expensesData.historyStats[mKey].spent = mItems.reduce((sum, i) => sum + i.amount, 0);
         });
     }
 
@@ -639,17 +752,39 @@ function submitEditedTx() {
     }
 }
 
-function openPastExpenseModal(month) {
-    selectedPastMonth = month;
+function openPastExpenseModal(targetMonthYear = null) {
+    const parsed = parseMonthYearKey(targetMonthYear || formatCurrentMonthYear());
+    selectedPastMonth = parsed.month;
+    selectedPastYear = parsed.year;
+    
     const label = document.getElementById('pastTargetMonthLabel');
-    if (label) label.innerText = `Target Month: ${month}`;
+    if (label) label.innerText = targetMonthYear ? `Target: ${parsed.month} ${parsed.year}` : `Select Target Period`;
     
     const nameEl = document.getElementById('pastExpenseName');
     const amtEl = document.getElementById('pastExpenseAmount');
+    const monthSelect = document.getElementById('pastExpenseMonth');
+    const yearSelect = document.getElementById('pastExpenseYear');
     const daySelect = document.getElementById('pastExpenseDay');
     
     if (nameEl) nameEl.value = "";
     if (amtEl) amtEl.value = "";
+    
+    // Populate Month dropdown (Jan to Dec)
+    if (monthSelect) {
+        monthSelect.innerHTML = '';
+        MONTH_NAMES.forEach(m => {
+            monthSelect.innerHTML += `<option value="${m}" class="bg-black text-amber-400" ${m === parsed.month ? 'selected' : ''}>${m}</option>`;
+        });
+    }
+
+    // Populate Year dropdown (Current year - 5 to Current year + 1)
+    if (yearSelect) {
+        yearSelect.innerHTML = '';
+        const curY = new Date().getFullYear();
+        for (let y = curY + 1; y >= curY - 5; y--) {
+            yearSelect.innerHTML += `<option value="${y}" class="bg-black text-amber-400" ${y === parsed.year ? 'selected' : ''}>${y}</option>`;
+        }
+    }
     
     // Populate Date numbers dropdown (1 to 31)
     if (daySelect) {
@@ -662,28 +797,35 @@ function openPastExpenseModal(month) {
 
     const modal = document.getElementById('addPastExpenseModal');
     if (modal) modal.classList.remove('hidden');
+    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
 }
 
 function closePastExpenseModal() {
     const modal = document.getElementById('addPastExpenseModal');
     if (modal) modal.classList.add('hidden');
     selectedPastMonth = null;
+    selectedPastYear = null;
 }
 
 function submitPastExpenseTx() {
     const nameEl = document.getElementById('pastExpenseName');
     const amtEl = document.getElementById('pastExpenseAmount');
+    const monthSelect = document.getElementById('pastExpenseMonth');
+    const yearSelect = document.getElementById('pastExpenseYear');
     const daySelect = document.getElementById('pastExpenseDay');
     if (!nameEl || !amtEl) return;
     
     const name = nameEl.value.trim();
     const amt = parseFloat(amtEl.value);
     const selectedDay = daySelect ? daySelect.value : '15';
+    const selectedMonth = monthSelect ? monthSelect.value : (selectedPastMonth || MONTH_NAMES[new Date().getMonth()]);
+    const selectedYear = yearSelect ? parseInt(yearSelect.value) : (selectedPastYear || new Date().getFullYear());
     
     if (!name || isNaN(amt) || amt <= 0) return alert("Valid name and amount required");
 
-    const currentMonthName = new Date().toLocaleDateString('en-IN', { month: 'short' });
-    const dateStr = `${selectedDay} ${selectedPastMonth}, 12:00 PM`;
+    const targetMonthYearKey = `${selectedMonth} ${selectedYear}`;
+    const currentMonthYearKey = formatCurrentMonthYear();
+    const dateStr = `${selectedDay} ${selectedMonth} ${selectedYear}, 12:00 PM`;
     
     expensesData.list.unshift({
         id: Date.now(),
@@ -693,13 +835,17 @@ function submitPastExpenseTx() {
         icon: getIconForExpense(name)
     });
 
-    if (selectedPastMonth !== currentMonthName) {
-        if (!expensesData.historyStats) expensesData.historyStats = {};
-        if (!expensesData.historyStats[selectedPastMonth]) {
-            expensesData.historyStats[selectedPastMonth] = { limit: 0, spent: 0 };
-        }
-        expensesData.historyStats[selectedPastMonth].spent += amt;
+    if (!expensesData.historyStats) expensesData.historyStats = {};
+    if (!expensesData.historyStats[targetMonthYearKey]) {
+        expensesData.historyStats[targetMonthYearKey] = { 
+            limit: targetMonthYearKey === currentMonthYearKey ? expensesData.budget : 0, 
+            spent: 0 
+        };
     }
+    
+    // Recalculate spent for this month-year accurately
+    const mSpent = expensesData.list.filter(item => isItemInMonthYear(item, targetMonthYearKey)).reduce((sum, i) => sum + i.amount, 0);
+    expensesData.historyStats[targetMonthYearKey].spent = mSpent;
 
     saveAll();
     closePastExpenseModal();
@@ -730,6 +876,12 @@ function exportCSV() {
 async function deleteExpense(id) { 
     if (await customConfirm("Delete Expense", "Remove this expense permanently?")) { 
         expensesData.list = expensesData.list.filter(e => e.id !== id); 
+        if (expensesData.historyStats) {
+            Object.keys(expensesData.historyStats).forEach(mKey => {
+                const mItems = expensesData.list.filter(item => isItemInMonthYear(item, mKey));
+                expensesData.historyStats[mKey].spent = mItems.reduce((sum, i) => sum + i.amount, 0);
+            });
+        }
         saveAll(); 
         renderExpenses(); 
     } 
