@@ -25,7 +25,7 @@ FINCAL/
 ├── server.js                # Production Express + MongoDB simultaneous server
 ├── package.json             # NPM dependencies and run scripts
 ├── .env.example             # Environment configuration template
-└── README.md                # Documentation
+└── README.md                # Documentation and setup
 ```
 
 ## 🚀 Features
